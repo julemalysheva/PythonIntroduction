@@ -9,7 +9,7 @@
 a = float(input("Введите дробь: "))
 if a % 1 != 0:
     b = a * 10
-    print(int(b % 10))
+    print(int(b % 10)) 
 else:
     print("нет")
 
