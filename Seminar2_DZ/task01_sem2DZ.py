@@ -106,4 +106,16 @@ print(f'2 вариант: {sum_digits2(number_input)}')
 print(f'3 вариант: {sum_digits3(number_input)}')
 print(f'Вариант по строке: {sum_digitsofstr(number_input)}')
 
+# еще один вариант решения, где проверка идет на равенство целому числу, а не по остатку деления
+# a = float(input('a = '))
+# c = 0
+# sum = 0
+# while a!=int(a):
+#     a *= 10
+# b = a
+# while b != 0:
+#     sum += b%10
+#     b = b//10
+# print(int(sum))
 
+# exit()

@@ -1,3 +1,16 @@
+a = float(input('a = '))
+c = 0
+sum = 0
+while a!=int(a):
+    a *= 10
+b = a
+while b != 0:
+    sum += b%10
+    b = b//10
+print(int(sum))
+
+exit()
+
 #print('Введите a')
 #a = int(input('Введите a: '))
 #print('Введите b')
