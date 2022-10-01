@@ -21,8 +21,8 @@ def check_str_num(num, str_list):
     check_str = False
     str_num = str(num)
     for line in str_list:
-        for char in line: #if n in list1[i]: здесь у ребят оптимальнее было условие
-            if char == str_num:
+        for char in line: #if n in list1[i]: здесь у ребят оптимальнее было
+            if char == str_num:#хотя я проверяю конкретно кажд.символ, а не набор в строке
                 check_str = True
                 break
     return check_str
