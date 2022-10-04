@@ -39,7 +39,7 @@ def concatenatio(*params): # * дает набор аргументов - люб
  return res
 # print(concatenatio('a', 's', 'd', 'w')) # asdw
 # print(concatenatio('a', '1', 'd', '2')) # a1d2
-print(concatenatio(1, 2, 3, 4)) # TypeError: ...
+print(concatenatio(1, 2, 3, 4)) # TypeError: ...если в функции явно указан тип Стринг
 
 def fib(n):
  if n in [1, 2]:
@@ -114,6 +114,7 @@ for (k,v) in dictionary.items():
 # down: ↓
 # right: →    
 
+# Множества
 a = {1, 2, 3, 5, 8}
 b = set([2, 5, 8, 13, 21])
 c = set((2, 5, 8, 13, 21))
