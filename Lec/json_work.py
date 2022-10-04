@@ -1,6 +1,6 @@
 import json
 
-#BD=[12345,True,"яблоко",{"Миша": [898981646,464654654] }]
+# BD=[12345,True,"яблоко",{"Миша": [898981646,464654654] }]
 # сначала запускаем save, потом load
 
 def load():
@@ -16,10 +16,10 @@ def save():
             with open('BD.json', 'w', encoding='utf-8') as fh:  # открываем файл на запись
                 fh.write(json.dumps(BD,
                                     ensure_ascii=False))  # преобразовываем словарь data в unicode-строку и записываем в файл
-            print('БД успещно сохранена')
+            print('БД успешно сохранена')
 
-#save()
+# save()
 
-
+# exit()
 BDnew = load ()
 print(BDnew)
