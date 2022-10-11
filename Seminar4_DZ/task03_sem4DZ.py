@@ -41,7 +41,7 @@ def create_polynomial(k):
             pol.append(str(kf[0]))        
     # print(pol)
     str_pol = " + ".join(pol)
-    str_pol = str_pol.replace("1*x", "x")
+    str_pol = str_pol.replace(" 1*x", " x")
     str_pol = str_pol + ' = 0'
     # print(str_pol)
     return str_pol
@@ -51,4 +51,11 @@ k = input_num('Натуральная степень k = ')
 str_polynomial = create_polynomial(k)
 print(str_polynomial)
 with open('Polynomial.txt', 'w') as data: 
+    data.write(str_polynomial)
+
+#формирую второй файл для след. задачи:
+k = input_num('Натуральная степень k = ')
+str_polynomial = create_polynomial(k)
+print(str_polynomial)
+with open('Polynomial2.txt', 'w') as data: 
     data.write(str_polynomial)
