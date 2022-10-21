@@ -148,12 +148,12 @@ def add_field(staff, field):
 # также в мейн нужно будет проверить роль и права, при наличии права - запустить ф-цию,
 # если нет - сообщить, что нет прав
 
-new_sotr = input('\nВведите Фамилию и инициалы нового сотрудника: ')
-add_worker(staff, new_sotr)
-print_select_fields(staff,all_fields)
+# new_sotr = input('\nВведите Фамилию и инициалы нового сотрудника: ')
+# add_worker(staff, new_sotr)
+# print_select_fields(staff,all_fields)
 
-new_field = input('\nВведите название нового поля данных для карточки сотрудника: ')
-add_field(staff,new_field)
+# new_field = input('\nВведите название нового поля данных для карточки сотрудника: ')
+# add_field(staff,new_field)
 
 # удаление пока пропишу здесь, чтоб не делать импорт и не переносить переменные - потом все свести куда надо
 def del_sotr(staff,key):
@@ -175,11 +175,59 @@ def del_key(staff, key_field):
 
 
 
-sotr_del = input('Выберите/введите сотрудника, чью запись нужно удалить: ')        
-del_sotr(staff,sotr_del)
-print_select_fields(staff,all_fields)
+# sotr_del = input('Выберите/введите сотрудника, чью запись нужно удалить: ')        
+# del_sotr(staff,sotr_del)
+# print_select_fields(staff,all_fields)
 
-del_field = input('Выберите/введите поле для удаления: ')
-del_key(staff, del_field)
-print_select_fields(staff,all_fields)
+# del_field = input('Выберите/введите поле для удаления: ')
+# del_key(staff, del_field)
+# print_select_fields(staff,all_fields)
 
+
+# прописываю изменения данных - перенести в отдельный модуль и настроить связи
+
+# изменить какое-то поле пакетно или по сотруднику, по умолчанию пакетно, при выборе сотрудника передается аргумент сотр
+def change_item_field(staff, field, sotr=''):
+    if sotr == '':
+        for k, v in staff.items():
+            if field in v:
+                v[field] = input(f'{k} новое значение поля {field}: ')
+            else:
+                # фикс лог
+                print(f'Поле {field} не найдено')    
+    else:
+        if sotr in staff:
+            if field in staff[sotr]:
+                staff[sotr][field] = input(f'{sotr} новое значение поля {field}: ')   
+            else:
+                # фикс лог
+                print(f'Поле {field} не найдено')          
+        else:
+             # фикс лог
+            print(f'Сотрудник {sotr} не найден')   
+                 
+
+
+field_for_change = input('Поле для редактирования: ')  
+if field_for_change in all_fields:
+    flag = input('\nМеняем у всех или выбрать сотрудника?\n1-у всех\n2-у сотрудника\nВведите свой выбор:')
+    if flag == '1':
+        change_item_field(staff, field_for_change)  
+        print_select_fields(staff,[field_for_change])
+    elif flag == '2':
+        sotr = input('Выберите/введите сотрудника, чью запись нужно изменить: ')  
+        change_item_field(staff, field_for_change,sotr)   
+        print_select_fields(staff,[field_for_change]) #или показывать карточку сотрудника с этим полем
+else:  
+        #    фикс лог
+    print(f'Поле {field_for_change} не найдено')    
+
+#пакетно повысить оклад на определенный процент
+def indexation(staff, percent):
+    for k, v in staff.items():
+            if "Оклад" in v:
+                v["Оклад"] = round(v["Оклад"]*percent/100+v["Оклад"])
+                    
+percent = float(input('\nПроцент повышения оклада: '))
+indexation(staff, percent)
+print_select_fields(staff, ["Оклад"])
