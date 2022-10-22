@@ -148,12 +148,12 @@ def add_field(staff, field):
 # также в мейн нужно будет проверить роль и права, при наличии права - запустить ф-цию,
 # если нет - сообщить, что нет прав
 
-# new_sotr = input('\nВведите Фамилию и инициалы нового сотрудника: ')
-# add_worker(staff, new_sotr)
-# print_select_fields(staff,all_fields)
+new_sotr = input('\nВведите Фамилию и инициалы нового сотрудника: ')
+add_worker(staff, new_sotr)
+print_select_fields(staff,all_fields)
 
-# new_field = input('\nВведите название нового поля данных для карточки сотрудника: ')
-# add_field(staff,new_field)
+new_field = input('\nВведите название нового поля данных для карточки сотрудника: ')
+add_field(staff,new_field)
 
 # удаление пока пропишу здесь, чтоб не делать импорт и не переносить переменные - потом все свести куда надо
 def del_sotr(staff,key):
@@ -175,13 +175,13 @@ def del_key(staff, key_field):
 
 
 
-# sotr_del = input('Выберите/введите сотрудника, чью запись нужно удалить: ')        
-# del_sotr(staff,sotr_del)
-# print_select_fields(staff,all_fields)
+sotr_del = input('Выберите/введите сотрудника, чью запись нужно удалить: ')        
+del_sotr(staff,sotr_del)
+print_select_fields(staff,all_fields)
 
-# del_field = input('Выберите/введите поле для удаления: ')
-# del_key(staff, del_field)
-# print_select_fields(staff,all_fields)
+del_field = input('Выберите/введите поле для удаления: ')
+del_key(staff, del_field)
+print_select_fields(staff,all_fields)
 
 
 # прописываю изменения данных - перенести в отдельный модуль и настроить связи
