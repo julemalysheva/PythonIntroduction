@@ -24,19 +24,19 @@ def change_item_field(staff, field, sotr=''):
                  
 
 
-field_for_change = input('Поле для редактирования: ')  
-if field_for_change in all_fields:
-    flag = input('\nМеняем у всех или выбрать сотрудника?\n1-у всех\n2-у сотрудника\nВведите свой выбор:')
-    if flag == '1':
-        change_item_field(staff, field_for_change)  
-        print_select_fields(staff,[field_for_change])
-    elif flag == '2':
-        sotr = input('Выберите/введите сотрудника, чью запись нужно изменить: ')  
-        change_item_field(staff, field_for_change,sotr)   
-        print_select_fields(staff,[field_for_change]) #или показывать карточку сотрудника с этим полем
-else:  
-        #    фикс лог
-    print(f'Поле {field_for_change} не найдено')    
+# field_for_change = input('Поле для редактирования: ')  
+# if field_for_change in all_fields:
+#     flag = input('\nМеняем у всех или выбрать сотрудника?\n1-у всех\n2-у сотрудника\nВведите свой выбор:')
+#     if flag == '1':
+#         change_item_field(staff, field_for_change)  
+#         print_select_fields(staff,[field_for_change])
+#     elif flag == '2':
+#         sotr = input('Выберите/введите сотрудника, чью запись нужно изменить: ')  
+#         change_item_field(staff, field_for_change,sotr)   
+#         print_select_fields(staff,[field_for_change]) #или показывать карточку сотрудника с этим полем
+# else:  
+#         #    фикс лог
+#     print(f'Поле {field_for_change} не найдено')    
 
 #пакетно повысить оклад на определенный процент
 def indexation(staff, percent):
@@ -44,9 +44,9 @@ def indexation(staff, percent):
             if "Оклад" in v:
                 v["Оклад"] = round(v["Оклад"]*percent/100+v["Оклад"])
                     
-percent = float(input('\nПроцент повышения оклада: '))
-indexation(staff, percent)
-print_select_fields(staff, ["Оклад"])
+# percent = float(input('\nПроцент повышения оклада: '))
+# indexation(staff, percent)
+# print_select_fields(staff, ["Оклад"])
 
 # можно для гл.админа доб.возм-ть изменения названия поля - автоматически поменять всем, старое значение присвоить новому
 # и старое удалить

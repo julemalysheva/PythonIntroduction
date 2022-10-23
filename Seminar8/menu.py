@@ -32,8 +32,8 @@ def option_start():
 # подтверждение выбора - можно использовать во многих запросах, не только при выходе
 def check_yes():
     yn = ynbox(msg = "Вы уверены?",title = "Подтвердите выбор",choices =('Да','Нет'),image = None, default_choice = 'Да', cancel_choice = 'Нет')
-    if yn:
-        msgbox('Подтверждение принято')
+    # if yn:
+    #     msgbox('Подтверждение принято')
     log.menu_logger(f'Подтверждение выбора {bool(yn)}')
     return yn
 
@@ -109,13 +109,45 @@ def choice_menu(user): #добавить запись в лог здесь
 
 #или проверять это уже в main и отдельной ф-цией запрашивать значения для выборки и изменений
 # которое потом передавать в нужную ф-цию из др. модулей 
+def enter_item(txt):
+    st = enterbox(txt)
+    return st
+
+def input_fields_to_list(list_fields):
+    fields_sotr = multenterbox("Заполните карточку нового сотрудника",title = 'Персональные данные',fields = (list_fields))
+    return fields_sotr
+# здесь запрашиваем несколько значений пользовательского ввода
+# н-р при создании новой карточки
+
+# число в диапазоне
+def integer_item(msg,lowerbound,upperbound):
+    # msg = 'Введите число, диапазон от 0 до 100'
+    title = 'Только числовой тип'
+    # lowerbound = 0
+    # upperbound = 100
+    default = 0
+    result = integerbox(msg,title,default,lowerbound,upperbound)
+    return result
+
+# для выбора полей для печати, например. когда несколько можно выбрать - возвращает список
+def mult_items(all_fields):
+    msg = 'Выберите от одного до всех значений'
+    title = 'Множественный выбор'
+    choices = (all_fields)
+    answer = multchoicebox(msg,title,choices)
+    # for item in answer1: #здесь можно выбрать много значений?
+    #     print (item)     #и в цикле записывать в список - по которому потом печатать если выбраны
+    return answer
+
 
 # здесь показываем результаты запросов выборки через текст или код бокс
-def view_data():
-    pass
+def view_data(text, title):
+    log.res_logger()
+    msg = f'По вашему запросу сформировано:' 
+    textbox(msg, title, text)
     # выдача рез-та на экран или 
 
 # здесь показываем месседж бокс с подтверждением действия и вызываем view_data при необходимости
-# показать новый вид карточки и т.д.
-def show_event_validation():    
-    pass
+# показать новый вид карточки и т.д.-какие-то действия, кроме выборки
+def show_event_validation(task, description):    
+    msgbox(f'Задача: *{task}*  - {description}')
