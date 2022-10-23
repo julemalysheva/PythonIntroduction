@@ -206,7 +206,17 @@ while True:
         elif point == 'все данные таблицей':
             text = print_select_fields(staff, all_fields, len_field)
             view_data(text, point)
-    
+
+        elif point == 'по значениям полей':
+            # выбираем поле
+            field = choice_field(f'Выберите одно поле:', point, all_fields)
+            if field!=None:
+                # if field in all_fields:
+                item = enter_value_for_key(field) 
+                # else: show_event_validation(point,'Поле не найдено')   
+            else: show_event_validation(point,'Значение не выбрано')   
+            text = print_for_key_value(staff, field, item)
+            view_data(text, point)
 
     elif option == 1: #'Смотреть лог'
         view_log('log_staff.txt')

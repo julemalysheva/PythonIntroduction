@@ -5,6 +5,8 @@
 
 from easygui import *
 import logger as log
+from datetime import datetime, date
+
 
 # запускаем вход в программу - проверяем пользовательские права
 # список кортежей логин/пароль - и по ним проверять полученный список,преобразовав в кортеж на вхождение
@@ -152,3 +154,75 @@ def view_data(text, title):
 def show_event_validation(task, description):  
     log.res_logger(f'Задача: *{task}*  - {description}')  #см.может убрать потом
     msgbox(f'Задача: *{task}*  - {description}')
+
+def choice_field(msg,title,choices):
+    res = choicebox(msg,title,(choices))
+    return res
+
+def enter_value_for_key(section):
+    # для целей выборки создаем список числовых полей
+    fields_int = ["Возраст", "Оклад", "Стаж"]
+    # для даты
+    date_fields = ["Дата рождения", "Дата приема"]
+
+    # если поле числовое - предлагаем свои варианты
+    if section in fields_int:
+        var = integer_item(
+            'Введите: \n1 - выбор конкретного значения \n2 - выбор диапазона\n',1,2)
+        if var == 1:
+            el = integer_item('Введите интересующее вас значение: ',0,1000000)
+        elif var == 2:
+            el = []
+            start = integer_item('Введите значение для поиска ОТ: ',0,1000000)
+            end = integer_item('Введите значение для поиска ДО: ',0,1000000)
+            el.append(start)
+            el.append(end)
+        # else: #у меня выбор ограничен 1-2
+        #     # фикс лог
+        #     print('Выбран несуществующий вариант')
+
+    # добавим работу с датой - другие варианты запроса
+    elif section in date_fields:
+        el = (None, None)
+        var = choicebox('Выберите вариант отбора значений','Условия выборки',('выбор месяца','выбор года','выбор месяца и года'))
+        if var == 'выбор месяца':
+            el = integer_item('Введите номер месяца: ',1,12)
+            if  el != None:
+                el = (el, None)
+            else:
+                # фикс лог
+                msgbox('Выбор отменен')
+        elif var == 'выбор года':
+            el = integer_item('Введите значение года: ',1900,int(date.today().year))
+            if el != None:
+                el = (None, el)
+            else:
+                # фикс лог
+                msgbox('Выбор отменен')
+        elif var == 'выбор месяца и года':
+            el1 = integer_item('Введите значение месяца: ',1,12)
+            if el1 != None:
+                el = (el1, None)
+            else:
+                # фикс лог
+                msgbox('Выбор отменен')   
+
+            el2 = integer_item('Введите значение года: ',1900,int(date.today().year))     
+            if el2 != None:
+                el = (el1, el2)
+            else:
+                # фикс лог
+                msgbox('Выбор отменен')
+
+        else:
+            # фикс лог
+            msgbox('Выбор отменен')
+
+    elif section == "Пол":
+        el = choicebox('Выберите вариант отбора значений','Условия выборки',('М','Ж'))
+
+    # в иных случаях при наличии такого поля в базе
+    else: 
+        el = enter_item('Введите интересующее вас значение: ')
+
+    return el    

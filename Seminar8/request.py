@@ -83,3 +83,66 @@ def print_all_for_worker(dict, key):
         msgbox('Такой сотрудник не найден')
 
     return res
+
+# по отделу, по должности, по полу и .тд.,т.е. по конкретному значению вложенного ключа
+# сейчас печатает только ФИО и ТН - можно добавить флаг
+# 1 - печатать только ФИО по выбранному параметру
+# 2- печатать все данные по тем сотр-м, кот.соответствуют условию отбора
+# без передачи параметров сделать флаг в ф-ции по умолчанию - только ФИО ТН, например
+def print_for_key_value(dict, key, item):
+    # для целей выборки создаем список числовых полей
+    fields_int = ["Возраст", "Оклад", "Стаж"]
+    # для даты
+    date_fields = ["Дата рождения", "Дата приема"]
+
+    res = f'\nДанные по запросу - {key} = {item} ":"'
+    # print('\nДанные по запросу - ', key, "=", item, ":")
+    count_find = 0
+    for k in dict:
+        
+        # если поле для поиска числовое
+        if key in fields_int and isinstance(item, list):
+            # если значение этого ключа попадает в диапазон
+            if item[0] <= int(dict[k][key]) <= item[1]:
+                res+=f'\nФИО: {k} \tТН: {dict[k]["ТН"]} \t{str(key)}: {dict[k][key]}'
+                # print(
+                #     f'ФИО: {k} \tТН: {dict[k]["ТН"]} \t{str(key)}: {dict[k][key]}')
+                count_find += 1
+        
+        # если работаем с датой
+        elif key in date_fields:
+            li_date = dict[k][key].split(".") #0-день,1-месяц,2-год
+            li_date = list(map(int,li_date))
+            if item[0] != None and item[1] != None: #ищем месяц и год
+                if li_date[1] == item[0] and li_date[2] == item[1]:
+                    res+=f'\nФИО: {k} \tТН: {dict[k]["ТН"]} \t{str(key)}: {dict[k][key]}'
+                    # print(
+                    #     f'ФИО: {k} \tТН: {dict[k]["ТН"]} \t{str(key)}: {dict[k][key]}')
+                    count_find += 1
+            elif item[0] != None and item[1] == None: #ищем месяц 
+                if li_date[1] == item[0]:
+                    res+=f'\nФИО: {k} \tТН: {dict[k]["ТН"]} \t{str(key)}: {dict[k][key]}'
+                    # print(
+                    #     f'ФИО: {k} \tТН: {dict[k]["ТН"]} \t{str(key)}: {dict[k][key]}')
+                    count_find += 1
+            elif item[0] == None and item[1] != None: #ищем год 
+                if li_date[2] == item[1]:
+                    res+=f'\nФИО: {k} \tТН: {dict[k]["ТН"]} \t{str(key)}: {dict[k][key]}'
+                    # print(
+                    #     f'ФИО: {k} \tТН: {dict[k]["ТН"]} \t{str(key)}: {dict[k][key]}')
+                    count_find += 1
+
+        # в остальных случаях
+        elif key in dict[k]:  # если искомый ключ есть во вложенном словаре сотрудника
+            if dict[k][key] == item:  # если значение этого ключа совпадает с искомым
+                res+=f'\nФИО: {k} \tТН: {dict[k]["ТН"]} \t{str(key)}: {dict[k][key]}'
+                # print(
+                #     f'ФИО: {k} \tТН: {dict[k]["ТН"]} \t{str(key)}: {dict[k][key]}')
+                count_find += 1
+                
+    if count_find == 0:
+        # фиксируем лог и
+        res = 'По заданным параметрам ничего не найдено'
+        # print('По заданным параметрам ничего не найдено')
+
+    return res    
