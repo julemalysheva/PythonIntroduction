@@ -78,6 +78,10 @@ while True:
     option = option_start()
     if option == 0: #'Работа с базой'
         print('Работа с базой')
+        #от выбранного пункта и подпункта строить вызов view_data() через переменную текст?
+        point = choice_menu(user) 
+        # if point #идет проверка и вызов нужных ф-ций из нужных модулей
+        # view_data()
     elif option == 1: #'Смотреть лог'
         view_log('log_staff.txt')
     elif option == 2: #'Сохранить'
