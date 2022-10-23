@@ -79,9 +79,9 @@ while True:
     if option == 0: #'Работа с базой'
         print('Работа с базой')
     elif option == 1: #'Смотреть лог'
-        print('Смотреть лог')
+        view_log('log_staff.txt')
     elif option == 2: #'Сохранить'
-        save(staff) #проверить,что-то пошло не так
+        save(staff) 
     else: #'Выход'
         if check_yes():
             save(staff)
