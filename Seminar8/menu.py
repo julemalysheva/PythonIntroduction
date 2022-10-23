@@ -14,8 +14,8 @@ users = [('main','main'),('admin','admin'),('user','user')]
 def registration():
     list1 = ["Имя пользователя","Пароль"]
     while True: 
-        user = multpasswordbox("Пожалуйста, введите свой логин и пароль",title = "Авторизоваться",fields = (list1))
-        user = tuple(user)
+        user = tuple(multpasswordbox("Пожалуйста, введите свой логин и пароль",title = "Авторизоваться",fields = (list1)))
+        # user = tuple(user)
         if user in users:
             log.register_logger(f'{user[0]} - успешный вход в систему')
             msgbox(f'Привет {user[0]}, добро пожаловать в интерфейс базы сотрудников')
@@ -25,3 +25,17 @@ def registration():
             log.error_logger(f'{user} - неверный логин/пароль')
             msgbox('Неверные логин/пароль, попробуйте снова')
     return user[0]   
+
+def option_start():
+    option = indexbox(msg = "Продолжите выбор",title = "Стартовое меню",choices =('Работа с базой','Смотреть лог','Сохранить','Выход'))
+    log.menu_logger(f'{option} - стартовое меню')
+    print("Ваш выбор:",option)
+    return option
+
+# подтверждение выбора - можно использовать во многих запросах, не только при выходе
+def check_yes():
+    yn = ynbox(msg = "Вы уверены?",title = "Подтвердите выбор",choices =('Да','Нет'),image = None, default_choice = 'Да', cancel_choice = 'Нет')
+    if yn:
+        msgbox('Подтверждение принято')
+    log.menu_logger(f'Подтверждение выбора {bool(yn)}')
+    return yn

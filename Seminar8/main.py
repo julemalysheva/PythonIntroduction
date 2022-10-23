@@ -6,12 +6,11 @@ from bd_json import *
 import logger as log
 
 # запускаем вход в программу - проверяем пользовательские права
-# список кортежей логин/пароль - и по ним проверять полученный список,преобразовав в кортеж на вхождение
 user = registration()
 print(user)
 
 try:
-    load()
+    staff = load()
 except:
     log.error_logger('Ошибка загрузки базы')
     staff = {
@@ -72,8 +71,22 @@ except:
         "Дата приема": '14.04.2007'
     }
 }
-
-
+# пока печатаем для проверки загрузки 
 print(staff)
-# оставить потом при выходе сохранение или при желании юзера
-# save(staff)    
+# непрерывный цикл меню до выхода юзера
+while True:
+    option = option_start()
+    if option == 0: #'Работа с базой'
+        print('Работа с базой')
+    elif option == 1: #'Смотреть лог'
+        print('Смотреть лог')
+    elif option == 2: #'Сохранить'
+        save(staff) #проверить,что-то пошло не так
+    else: #'Выход'
+        if check_yes():
+            save(staff)
+            break
+        
+
+
+

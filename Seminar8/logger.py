@@ -17,7 +17,7 @@ def register_logger(data=''):
 # записываем в лог вариант меню с запросом пользователя
 def menu_logger(data=''):
     with open('log_staff.txt', 'a',encoding="utf8") as file:
-        file.write('{} Выбран пункт меню {}\n'
+        file.write('{} Событие меню {}\n'
                     .format(dt.now().strftime('%d.%m.%Y-%H:%M'), data))
 # записываем в лог (фиксацию) ошибки с указанием даты/времени 
 def error_logger(data=''):
