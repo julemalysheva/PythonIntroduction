@@ -1,4 +1,5 @@
 # from main import len_field,all_fields
+
 # - карточки сотрудника по строкам
 # печатает список сотров с полными данными - всю базу последовательно по каждому сотру
 def print_all_data(staff):
@@ -58,3 +59,10 @@ def print_select_fields(staff, li_fields,len_field, sotr=''):
 
     # str_res = first_str + '\n' + str_item   
     return str_res    
+
+# печатает просто список сотрудников
+def print_list_worker(staff):
+    res = 'Сотрудники:\n '
+    for k in staff:
+        res+=f'\n{k}'
+    return res

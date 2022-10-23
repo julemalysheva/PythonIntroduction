@@ -6,8 +6,8 @@ from bd_json import *
 import logger as log
 from request import *
 from add import add_worker, add_field
-# from change import *
-# from del_staff import *
+from change import *
+from del_staff import *
 
 
 # запускаем вход в программу - проверяем пользовательские права
@@ -123,7 +123,27 @@ while True:
             # вывожу подтверждение выполнения задачи
             text = print_select_fields(staff, [field],len_field)  
             view_data(text,f'Выполнено: *{point}*')
-
+        elif point == 'удалить сотрудника':
+            sotr = enter_item(f'Выберите/введите сотрудника для удаления из базы\n{print_list_worker(staff)}')
+            if sotr != None:
+                if check_yes():
+                    staff = del_sotr(staff,sotr)
+                    show_event_validation(point,print_list_worker(staff)) 
+            else: show_event_validation(point,'Сотрудник не выбран')   
+        elif point == 'удалить поле в карточках':
+            key_field = enter_item(f'Выберите/введите одно поле для удаления:\n{all_fields}')
+            if key_field != None:
+                if check_yes():
+                    staff = del_key(staff,key_field)
+                    all_fields.remove(key_field)
+                    del len_field[key_field]
+                    show_event_validation(point,f'Выполнено\n{all_fields}') 
+            else: show_event_validation(point,'Значение не выбрано')   
+        elif point == "менять поля у всех":
+            pass
+        elif point == 'просто список сотрудников':
+            list_worker = print_list_worker(staff)
+            view_data(list_worker, point)
         elif point == 'выбрать поля для печати по всей базе':
             # выбираем поля для отображения из всего списка полей
             li_fields = mult_items(all_fields)
