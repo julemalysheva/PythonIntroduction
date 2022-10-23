@@ -139,8 +139,36 @@ while True:
                     del len_field[key_field]
                     show_event_validation(point,f'Выполнено\n{all_fields}') 
             else: show_event_validation(point,'Значение не выбрано')   
+
         elif point == "менять поля у всех":
-            pass
+            field_for_change = enter_item(f'Выберите/введите одно поле для изменения:\n{all_fields}')
+            if field_for_change!=None:
+                if field_for_change in all_fields:
+                    staff = change_item_field(staff, field_for_change)
+                    show_event_validation(point,f'Выполнено\n{print_select_fields(staff, [field_for_change], len_field)}') 
+                else: show_event_validation(point,'Поле не найдено')   
+            else: show_event_validation(point,'Значение не выбрано')   
+
+        elif point == "изменить поле у сотрудника":
+            sotr = enter_item(f'Выберите/введите сотрудника для редактирования\n{print_list_worker(staff)}')
+            if sotr != None:
+                field_for_change = enter_item(f'Выберите/введите одно поле для изменения:\n{all_fields}')
+                if field_for_change!=None:
+                    if field_for_change in all_fields:
+                        staff = change_item_field(staff, field_for_change,sotr)
+                        show_event_validation(point,f'Выполнено\n{print_select_fields(staff, [field_for_change], len_field,sotr)}') 
+                    else: show_event_validation(point,'Поле не найдено')   
+                else: show_event_validation(point,'Значение не выбрано')   
+            else: show_event_validation(point,'Сотрудник не выбран')   
+
+        elif point == "пакетная индексация окладов":
+            percent =  integer_item(f'Текущие оклады: \n{print_select_fields(staff, ["Оклад"],len_field)}\nПроцент повышения оклада:')   
+            if percent !=None:
+                staff = indexation(staff,percent)
+                show_event_validation(point,f'Выполнено\n{print_select_fields(staff, ["Оклад"], len_field)}') 
+            else: show_event_validation(point,'Значение не выбрано')   
+
+
         elif point == 'просто список сотрудников':
             list_worker = print_list_worker(staff)
             view_data(list_worker, point)
@@ -148,12 +176,37 @@ while True:
             # выбираем поля для отображения из всего списка полей
             li_fields = mult_items(all_fields)
             if li_fields != None:
-                text = print_select_fields(staff, li_fields, len_field) #если не сработает - передавать сюда len_f...
+                text = print_select_fields(staff, li_fields, len_field) 
                 view_data(text, point)
-            else: show_event_validation(point,'Поля не выбраны')    
+            else: show_event_validation(point,'Поля не выбраны')  
+
+        elif point == 'выбрать поля и сотрудника для печати':  
+            sotr = enter_item(f'Выберите/введите сотрудника для редактирования\n{print_list_worker(staff)}')
+            if sotr != None:
+                li_fields = mult_items(all_fields)
+                if li_fields != None:
+                    text = print_select_fields(staff, li_fields, len_field,sotr) 
+                    view_data(text, point)
+                else: show_event_validation(point,'Поля не выбраны')  
+            else: show_event_validation(point,'Сотрудник не выбран')   
+ 
         elif point == 'полные карточки всех сотрудников':
             text = print_all_data(staff)
             view_data(text, point)
+
+        elif point == 'карточка выбранного сотрудника':
+            sotr = enter_item(f'Выберите/введите сотрудника для редактирования\n{print_list_worker(staff)}')
+            if sotr != None:
+                if sotr in staff:
+                    text = print_all_for_worker(staff,sotr)
+                    view_data(text, point)
+                else: show_event_validation(point,'Сотрудник не найден')   
+            else: show_event_validation(point,'Сотрудник не выбран')   
+        # в этом случае поля наезжаеют др.на друга - в консоли лучше печатал
+        elif point == 'все данные таблицей':
+            text = print_select_fields(staff, all_fields, len_field)
+            view_data(text, point)
+    
 
     elif option == 1: #'Смотреть лог'
         view_log('log_staff.txt')

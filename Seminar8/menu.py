@@ -93,7 +93,7 @@ def choice_menu(user): #добавить запись в лог здесь
                     answer = choicebox(msg,title,choices)
                     if answer != None:
                         log.menu_logger(f'Выбран пункт -{answer}')
-                        print('Вы выбрали: '+ str(answer)) #выдает конкретное выбранное значение
+                        # print('Вы выбрали: '+ str(answer)) #выдает конкретное выбранное значение
                     else:
                         log.menu_logger('Выбор отменен')
                         msgbox('Вы отменили выбор')   
@@ -120,7 +120,7 @@ def input_fields_to_list(list_fields):
 # н-р при создании новой карточки
 
 # число в диапазоне
-def integer_item(msg,lowerbound,upperbound):
+def integer_item(msg,lowerbound=0,upperbound=100):
     # msg = 'Введите число, диапазон от 0 до 100'
     title = 'Только числовой тип'
     # lowerbound = 0
@@ -149,5 +149,6 @@ def view_data(text, title):
 
 # здесь показываем месседж бокс с подтверждением действия и вызываем view_data при необходимости
 # показать новый вид карточки и т.д.-какие-то действия, кроме выборки
-def show_event_validation(task, description):    
+def show_event_validation(task, description):  
+    log.res_logger(f'Задача: *{task}*  - {description}')  #см.может убрать потом
     msgbox(f'Задача: *{task}*  - {description}')

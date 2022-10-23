@@ -3,24 +3,28 @@
 # прописываю изменения данных - перенести в отдельный модуль и настроить связи
 
 # изменить какое-то поле пакетно или по сотруднику, по умолчанию пакетно, при выборе сотрудника передается аргумент сотр
+from easygui import *
+from menu import enter_item
+
 def change_item_field(staff, field, sotr=''):
     if sotr == '':
         for k, v in staff.items():
             if field in v:
-                v[field] = input(f'{k} новое значение поля {field}: ')
+                v[field] = enter_item(f'{k} - текущее значение {v[field]} \nВведите новое значение поля {field}: ')
             else:
                 # фикс лог
-                print(f'Поле {field} не найдено')    
+                msgbox(f'Поле {field} не найдено')    
     else:
         if sotr in staff:
             if field in staff[sotr]:
-                staff[sotr][field] = input(f'{sotr} новое значение поля {field}: ')   
+                staff[sotr][field] = enter_item(f'{sotr} - текущее значение {staff[sotr][field]} \nВведите новое значение поля {field}: ')   
             else:
                 # фикс лог
-                print(f'Поле {field} не найдено')          
+                msgbox(f'Поле {field} не найдено')          
         else:
              # фикс лог
-            print(f'Сотрудник {sotr} не найден')   
+            msgbox(f'Сотрудник {sotr} не найден')   
+    return staff        
                  
 
 
@@ -43,6 +47,7 @@ def indexation(staff, percent):
     for k, v in staff.items():
             if "Оклад" in v:
                 v["Оклад"] = round(v["Оклад"]*percent/100+v["Оклад"])
+    return staff            
                     
 # percent = float(input('\nПроцент повышения оклада: '))
 # indexation(staff, percent)
