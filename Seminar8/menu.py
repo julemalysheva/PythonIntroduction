@@ -27,7 +27,7 @@ def registration():
 
 def option_start():
     start_menu = {0: 'Работа с базой',1: 'Смотреть лог',2: 'Сохранить',3: 'Выход'}
-    option = indexbox(msg = "Продолжите выбор",title = "Стартовое меню",choices =('Работа с базой','Смотреть лог','Сохранить','Выход'))
+    option = indexbox(msg = "Продолжите выбор",title = "Стартовое меню", choices =('Работа с базой','Смотреть лог','Сохранить','Выход'))
     log.menu_logger(f'{start_menu[option]} - стартовое меню')
     return option
 
@@ -144,7 +144,7 @@ def mult_items(all_fields):
 
 # здесь показываем результаты запросов выборки через текст или код бокс
 def view_data(text, title):
-    log.res_logger()
+    log.res_logger(title)
     msg = f'По вашему запросу сформировано:' 
     textbox(msg, title, text)
     # выдача рез-та на экран или 
@@ -167,19 +167,18 @@ def enter_value_for_key(section):
 
     # если поле числовое - предлагаем свои варианты
     if section in fields_int:
-        var = integer_item(
-            'Введите: \n1 - выбор конкретного значения \n2 - выбор диапазона\n',1,2)
-        if var == 1:
+        var = choicebox('Выберите вариант запроса:','Выборка по значению поля',('выбор конкретного значения','выбор диапазона'))
+        if var == 'выбор конкретного значения':
             el = integer_item('Введите интересующее вас значение: ',0,1000000)
-        elif var == 2:
+        elif var == 'выбор диапазона':
             el = []
             start = integer_item('Введите значение для поиска ОТ: ',0,1000000)
             end = integer_item('Введите значение для поиска ДО: ',0,1000000)
             el.append(start)
             el.append(end)
-        # else: #у меня выбор ограничен 1-2
+        else:  
+            msgbox('Выбор отменен')
         #     # фикс лог
-        #     print('Выбран несуществующий вариант')
 
     # добавим работу с датой - другие варианты запроса
     elif section in date_fields:

@@ -19,7 +19,7 @@ try:
 except:   
     log.error_logger('Ошибка загрузки all_fields.json') 
     all_fields = ["ТН", "Дата рождения", "Адрес", "Пол", "Возраст", "Телефон",
-                "Должность", "Оклад", "Отдел", "Стаж", "email", "Дата приема","График"]
+                "Должность", "Оклад", "Отдел", "Стаж", "email", "Дата приема"]
 
     # справочник, где каждому ключу соответствует длина строки. словарь длины строки
     # сделать его также глобальным,т.к. при добавлении поля нужно сюда также добавить значение
@@ -29,7 +29,7 @@ except:
     log.error_logger('Ошибка загрузки len_field.json') 
     len_field = {
         "ТН": 3,"Дата рождения": 10,"Адрес": 20,"Пол": 3,"Возраст": 7,"Телефон": 12,
-        "Должность": 20,"Оклад": 6,"Отдел": 15,"Стаж": 4,"email": 20,"Дата приема": 10,"График": 6
+        "Должность": 20,"Оклад": 6,"Отдел": 15,"Стаж": 4,"email": 20,"Дата приема": 10
     }
 
 # подумать, если нужно еще справочники даты и чисел, то можно их загружать из одного файла, просто списком
@@ -114,6 +114,7 @@ while True:
             # выводим новую карточку сотрудника
             text = print_all_for_worker(staff,sotr)
             view_data(text,f'Выполнено: *{point}*')
+
         elif point == 'новое поле для карточек':
             field = enter_item('Введите название нового поля\n')
             staff = add_field(staff, field)
@@ -123,15 +124,17 @@ while True:
             # вывожу подтверждение выполнения задачи
             text = print_select_fields(staff, [field],len_field)  
             view_data(text,f'Выполнено: *{point}*')
-        elif point == 'удалить сотрудника':
-            sotr = enter_item(f'Выберите/введите сотрудника для удаления из базы\n{print_list_worker(staff)}')
+
+        elif point == 'удалить сотрудника': 
+            sotr = choice_field('Выберите сотрудника для удаления из базы', point, tuple(staff.keys()))
             if sotr != None:
                 if check_yes():
                     staff = del_sotr(staff,sotr)
                     show_event_validation(point,print_list_worker(staff)) 
             else: show_event_validation(point,'Сотрудник не выбран')   
+
         elif point == 'удалить поле в карточках':
-            key_field = enter_item(f'Выберите/введите одно поле для удаления:\n{all_fields}')
+            key_field = choice_field('Выберите поле для удаления:',point,(all_fields))
             if key_field != None:
                 if check_yes():
                     staff = del_key(staff,key_field)
@@ -141,23 +144,19 @@ while True:
             else: show_event_validation(point,'Значение не выбрано')   
 
         elif point == "менять поля у всех":
-            field_for_change = enter_item(f'Выберите/введите одно поле для изменения:\n{all_fields}')
+            field_for_change = choice_field('Выберите поле для изменения:',point,(all_fields))
             if field_for_change!=None:
-                if field_for_change in all_fields:
-                    staff = change_item_field(staff, field_for_change)
-                    show_event_validation(point,f'Выполнено\n{print_select_fields(staff, [field_for_change], len_field)}') 
-                else: show_event_validation(point,'Поле не найдено')   
+                staff = change_item_field(staff, field_for_change)
+                show_event_validation(point,f'Выполнено\n{print_select_fields(staff, [field_for_change], len_field)}') 
             else: show_event_validation(point,'Значение не выбрано')   
 
         elif point == "изменить поле у сотрудника":
-            sotr = enter_item(f'Выберите/введите сотрудника для редактирования\n{print_list_worker(staff)}')
+            sotr = choice_field('Выберите сотрудника для редактирования поля', point, tuple(staff.keys()))
             if sotr != None:
-                field_for_change = enter_item(f'Выберите/введите одно поле для изменения:\n{all_fields}')
+                field_for_change = choice_field('Выберите поле для изменения:',point,(all_fields))
                 if field_for_change!=None:
-                    if field_for_change in all_fields:
-                        staff = change_item_field(staff, field_for_change,sotr)
-                        show_event_validation(point,f'Выполнено\n{print_select_fields(staff, [field_for_change], len_field,sotr)}') 
-                    else: show_event_validation(point,'Поле не найдено')   
+                    staff = change_item_field(staff, field_for_change,sotr)
+                    show_event_validation(point,f'Выполнено\n{print_select_fields(staff, [field_for_change], len_field,sotr)}') 
                 else: show_event_validation(point,'Значение не выбрано')   
             else: show_event_validation(point,'Сотрудник не выбран')   
 
@@ -168,10 +167,10 @@ while True:
                 show_event_validation(point,f'Выполнено\n{print_select_fields(staff, ["Оклад"], len_field)}') 
             else: show_event_validation(point,'Значение не выбрано')   
 
-
         elif point == 'просто список сотрудников':
             list_worker = print_list_worker(staff)
             view_data(list_worker, point)
+
         elif point == 'выбрать поля для печати по всей базе':
             # выбираем поля для отображения из всего списка полей
             li_fields = mult_items(all_fields)
@@ -181,7 +180,7 @@ while True:
             else: show_event_validation(point,'Поля не выбраны')  
 
         elif point == 'выбрать поля и сотрудника для печати':  
-            sotr = enter_item(f'Выберите/введите сотрудника для редактирования\n{print_list_worker(staff)}')
+            sotr = choice_field('Выберите сотрудника: ', point, tuple(staff.keys()))
             if sotr != None:
                 li_fields = mult_items(all_fields)
                 if li_fields != None:
@@ -195,13 +194,12 @@ while True:
             view_data(text, point)
 
         elif point == 'карточка выбранного сотрудника':
-            sotr = enter_item(f'Выберите/введите сотрудника для редактирования\n{print_list_worker(staff)}')
+            sotr = choice_field('Выберите сотрудника: ', point, tuple(staff.keys()))
             if sotr != None:
-                if sotr in staff:
-                    text = print_all_for_worker(staff,sotr)
-                    view_data(text, point)
-                else: show_event_validation(point,'Сотрудник не найден')   
+                text = print_all_for_worker(staff,sotr)
+                view_data(text, point)
             else: show_event_validation(point,'Сотрудник не выбран')   
+            
         # в этом случае поля наезжаеют др.на друга - в консоли лучше печатал
         elif point == 'все данные таблицей':
             text = print_select_fields(staff, all_fields, len_field)
