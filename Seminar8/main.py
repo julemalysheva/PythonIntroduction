@@ -161,7 +161,7 @@ while True:
             else: show_event_validation(point,'Сотрудник не выбран')   
 
         elif point == "пакетная индексация окладов":
-            percent =  integer_item(f'Текущие оклады: \n{print_select_fields(staff, ["Оклад"],len_field)}\nПроцент повышения оклада:')   
+            percent =  integer_item(f'Текущие оклады: \n{print_select_fields(staff, ["Оклад"],len_field)}\nПроцент повышения оклада:',1,100)   
             if percent !=None:
                 staff = indexation(staff,percent)
                 show_event_validation(point,f'Выполнено\n{print_select_fields(staff, ["Оклад"], len_field)}') 
@@ -199,7 +199,7 @@ while True:
                 text = print_all_for_worker(staff,sotr)
                 view_data(text, point)
             else: show_event_validation(point,'Сотрудник не выбран')   
-            
+
         # в этом случае поля наезжаеют др.на друга - в консоли лучше печатал
         elif point == 'все данные таблицей':
             text = print_select_fields(staff, all_fields, len_field)

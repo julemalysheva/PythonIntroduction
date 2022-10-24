@@ -46,7 +46,7 @@ def change_item_field(staff, field, sotr=''):
 def indexation(staff, percent):
     for k, v in staff.items():
             if "Оклад" in v:
-                v["Оклад"] = round(v["Оклад"]*percent/100+v["Оклад"])
+                v["Оклад"] = round(int(v["Оклад"])*percent/100+int(v["Оклад"]))
     return staff            
                     
 # percent = float(input('\nПроцент повышения оклада: '))

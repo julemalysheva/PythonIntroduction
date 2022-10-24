@@ -67,7 +67,7 @@ def choice_menu(user): #добавить запись в лог здесь
     answer = choicebox(msg,title,choices)
     if answer != None:
         log.menu_logger(f'Выбран пункт -{answer}')
-        print('Вы выбрали: '+ str(answer)) #выдает конкретное выбранное значение
+        # print('Вы выбрали: '+ str(answer)) #выдает конкретное выбранное значение
         if answer in ('добавить','удалить','изменить','выборка'):
             submenu = {
                 'добавить': ('добавить сотрудника', 'новое поле для карточек'),
@@ -81,7 +81,7 @@ def choice_menu(user): #добавить запись в лог здесь
             answer = choicebox(msg,title,choices)
             if answer != None:
                 log.menu_logger(f'Выбран пункт -{answer}')
-                print('Вы выбрали: '+ str(answer)) #выдает конкретное выбранное значение
+                # print('Вы выбрали: '+ str(answer)) #выдает конкретное выбранное значение
                 if answer == 'по сотрудникам и полям':
                     msg = 'Выберите интересующий вас пункт'
                     title = f'Раздел *{answer}*'
