@@ -40,6 +40,8 @@ def show_all(message):
     bot.send_message(message.chat.id,"Вот список фильмов")
     bot.send_message(message.chat.id, ", ".join(films))
 
+# посмотреть как работает это
+
 # @bot.message_handler(content_types='text')
 # def message_reply(message):
 #     if message.text=="Кнопка":
