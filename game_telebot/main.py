@@ -1,4 +1,3 @@
-from dataclasses import field
 import telebot
 from random import *
 from telebot import types
@@ -37,17 +36,18 @@ def game_message(message):
         text = print_field(field)
         bot.send_message(message.chat.id,f"Игровое поле:\n{text}")
         s(1)
-        bot.send_message(message.chat.id,f'''Играйте!\nЧтобы сделать ход - введите команду: 
-        '/mygo' №строки №столбца через пробел
-        Например: "/mygo 2 2" - чтобы сходить в центр''')
+        bot.send_message(message.chat.id,f'''Играйте! Вы ходите -{players[False][0]}-\nЧтобы сделать ход - введите команду: 
+        '/go' №строки №столбца через пробел
+        Например: "/go 2 2" - чтобы сходить в центр''')
     else:
-        bot.send_message(message.chat.id,f'''Играйте!\nЧтобы сделать ход - введите команду: 
-        '/mygo' №строки №столбца через пробел
-        Например: "/mygo 2 2" - чтобы сходить в центр''')
+        bot.send_message(message.chat.id,f'''Играйте! Вы ходите -{players[False][0]}-\nЧтобы сделать ход - введите команду: 
+        '/go' №строки №столбца через пробел
+        Например: "/go 2 2" - чтобы сходить в центр''')
 
 # здесь везде делать проверку выигрыша и наличие свободного хода 
 # [True - играет бот, False-играет человек]
-@bot.message_handler(commands=['mygo'])
+# можно доработать - выдавать кнопки, повторяющие поле - для хода, и по нажатию добавлять в поле
+@bot.message_handler(commands=['go'])
 def game_message(message):
     global field, win
     # если еще есть незанятые ячейки
@@ -85,9 +85,9 @@ def game_message(message):
 
                     if not none_hod(field) and not win:
                         s(1)
-                        bot.send_message(message.chat.id,f'''Играйте!\nЧтобы сделать ход - введите команду: 
-                        '/mygo' №строки №столбца через пробел
-                        Например: "/mygo 2 2" - чтобы сходить в центр''')
+                        bot.send_message(message.chat.id,f'''Играйте! Вы ходите -{players[False][0]}-\nЧтобы сделать ход - введите команду: 
+                        '/go' №строки №столбца через пробел
+                        Например: "/go 2 2" - чтобы сходить в центр''')
                     else: 
                         s(1)
                         bot.send_message(message.chat.id,f"Игра завершена\nИгровое поле:\n{text}\nНачните новую /game")
@@ -99,8 +99,25 @@ def game_message(message):
                 bot.send_message(message.chat.id,f"Игровое поле:\n{text}")
     else:
         s(1)
+        text = print_field(field)
         bot.send_message(message.chat.id,f"Игра завершена\nИгровое поле:\n{text}\nНачните новую /game")
-            
+
+@bot.message_handler(commands=['stop'])
+def stop_message(message):
+    global win
+    bot.send_message(message.chat.id,f"Ок - прекращаю игру..")
+    # bot.stop_bot() #так совсем останавливает бот с ошибкой
+    win = True
+    bot.send_message(message.chat.id,f"Для начала новой игры выберите\n/game")
+
+
+@bot.message_handler(content_types='text')
+def message_reply(message):
+    bot.send_message(message.chat.id,f'''{message.from_user.first_name}, пожалуйста, воспользуйтесь командами:
+    /game - чтобы начать новую игру
+    /go - чтобы совершить свой ход в текущей игре
+    /stop - остановить игру
+    ''')
 
 
 bot.polling()

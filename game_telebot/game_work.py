@@ -46,6 +46,7 @@ def ch_input(text):
     return pos
 
 def check_win(field, elem_go):
+    # проверяем по строкам
     for el in field:
         if el.count(elem_go) == 3:
             return True
@@ -66,9 +67,7 @@ def check_win(field, elem_go):
     if field[2][0] == elem_go and field[1][1] == elem_go and field[0][2] == elem_go:
         return True
 
-# вернуться позже,нужно не просто рандом, а умный ход, где уже есть макс.число эл-та бота, иначе если нет
-# лучше закрывать ход соперника, а потом можно рандом из пустой строки, столбца
-# 
+
 # пробую функцию проверки свободных ячеек для рандомного хода бота - через кортежи - работает, но этого мало
 def ch_field(field):
     _pos = [(index1,index2) for index1,value1 in enumerate(field) for index2,value2 in enumerate(value1) if value2=='_']
@@ -84,3 +83,16 @@ def none_hod(field):
         none_hod = True
     
     return none_hod
+    
+
+# вернуться позже,нужно не просто рандом, а умный ход, где уже есть макс.число эл-та бота, иначе если нет
+# лучше закрывать ход соперника, а потом можно рандом из пустой строки, столбца
+# field = [['0','_','0'],['_','_','_'],['_','_','_']]
+# def bot_hod(field, bot_el): #other_el
+#     _pos = [(index1,index2) for index1,value1 in enumerate(field) for index2,value2 in enumerate(value1) if value2==bot_el]
+#     # for el in field:
+#     #     if el.count(bot_el) == 2:
+#     #         return (index(el),index('_')) #позже подумать, как сделать проверку индекса и пр.
+#     return _pos
+            
+# print(bot_hod(field,'0'))            
