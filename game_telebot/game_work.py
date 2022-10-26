@@ -32,30 +32,20 @@ def set_players(human):
     print(dic)
     return (dic, dic[hod][1], hod)
 
-# как-то нужно возвращать ошибку, может проверять если тип не список - то возвращать в pos строку уведомления
-# наверное, придется эту проверку делать в мейн
-
 
 def ch_input(text):
-    # check_input = False
-    # while not check_input:
-    # убираем команду, остается 0й один элемент после разделителя пробела- это как раз строка с номером строки/столбца 
-    # через запятую
     text = text.split()[1:]
     try:
         pos = list(map(int, text))
-        # check_input = True
         if pos[0] > 3 or pos[1] > 3 or pos[0] < 1 or pos[1] < 1:
             pos = 'Значения могут быть только от 1 до 3\nПовторите команду'
             print('Значения могут быть только от 1 до 3')
-            # check_input = False
     except:
         pos = 'Некорректный ввод, повторите команду'
         print('Некорректный ввод')
     return pos
 
 def check_win(field, elem_go):
-    # проверяем по строкам через число вхождений
     for el in field:
         if el.count(elem_go) == 3:
             return True
@@ -85,3 +75,12 @@ def ch_field(field):
     print(_pos)
     pl = choice(_pos)
     return pl      
+
+# проверяем возможность хода в принципе
+def none_hod(field):
+    none_hod = False
+    _pos = [(index1,index2) for index1,value1 in enumerate(field) for index2,value2 in enumerate(value1) if value2=='_']
+    if _pos == None:
+        none_hod = True
+    
+    return none_hod
