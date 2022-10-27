@@ -3,9 +3,10 @@ from random import *
 from telebot import types
 from game_work import *
 from time import sleep as s
+import config
 
 
-API_TOKEN='5704779560:AAHgxQnfLfMsASBZxqFmy3xIbIaH-_ynCjE'
+API_TOKEN=config.Token
 bot = telebot.TeleBot(API_TOKEN)
 
 field = []
