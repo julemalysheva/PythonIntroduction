@@ -11,7 +11,8 @@ print('Готов к работе...')
 players = []
 bot_send = True
 
-
+# здесь обрабатывается полученная позиция - устанавливается новое значение
+# индексы поля, куда вносим значения, если свободны, call - чтоб добраться до message.chat.id и call.id
 def call_data(index1, index2, call):
     global board, players
     if hod % 2 == 0 and call.message.chat.id == user2.id:
