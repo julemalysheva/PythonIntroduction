@@ -12,7 +12,7 @@ bot = telebot.TeleBot(API_TOKEN)
 field = []
 players = {}
 hod = True
-win = False
+finish = False
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
@@ -21,8 +21,8 @@ def start_message(message):
 # пробую сделать через печать поля, подумать над выбором через 9 кнопок
 @bot.message_handler(commands=['game'])
 def game_message(message):
-    global field, players, hod,win
-    win = False
+    global field, players, hod,finish
+    finish = False
     field = new_field()
     text = print_field(field)
     bot.send_message(message.chat.id,f"Игровое поле:\n{text}")
@@ -50,9 +50,9 @@ def game_message(message):
 # можно доработать - выдавать кнопки, повторяющие поле - для хода, и по нажатию добавлять в поле
 @bot.message_handler(commands=['go'])
 def game_message(message):
-    global field, win
+    global field, finish
     # если еще есть незанятые ячейки
-    if not none_hod(field) and not win:
+    if not none_hod(field) and not finish:
         pl = ch_input(message.text)
         print(pl)
         if not isinstance(pl, list): #если ошибка ввода - вернулась строка ошибки
@@ -65,11 +65,11 @@ def game_message(message):
                 if check_win(field, players[False][0]):
                     bot.send_message(message.chat.id,f"Поздравляю с выигрышем!\n-{players[False][0]}-ки победили")
                     print('Поздравляю с выигрышем!')
-                    win = True
+                    finish = True
                     # exit()
                     # bot.stop_bot()
                 # после успешного хода человека всегда ходит бот и передает ход человеку, предлагая команду
-                if not none_hod(field) and not win: #ch_field(field) != None:
+                if not none_hod(field) and not finish: #ch_field(field) != None:
                     pl = ch_field(field)
                     print(pl)
                     s(1)
@@ -80,11 +80,11 @@ def game_message(message):
                     if check_win(field, players[True][0]):
                         bot.send_message(message.chat.id,f"Bot выиграл!\n-{players[True][0]}-ки победили")
                         print('Bot выиграл!')
-                        win = True
+                        finish = True
                         # exit()
                         # bot.stop_bot()
 
-                    if not none_hod(field) and not win:
+                    if not none_hod(field) and not finish:
                         s(1)
                         bot.send_message(message.chat.id,f'''Играйте! Вы ходите -{players[False][0]}-\nЧтобы сделать ход - введите команду: 
                         '/go' №строки №столбца через пробел
@@ -105,10 +105,10 @@ def game_message(message):
 
 @bot.message_handler(commands=['stop'])
 def stop_message(message):
-    global win
+    global finish
     bot.send_message(message.chat.id,f"Ок - прекращаю игру..")
     # bot.stop_bot() #так совсем останавливает бот с ошибкой
-    win = True
+    finish = True
     bot.send_message(message.chat.id,f"Для начала новой игры выберите\n/game")
 
 
