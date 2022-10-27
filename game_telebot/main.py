@@ -30,7 +30,7 @@ def game_message(message):
     bot.send_message(message.chat.id,f"\nЖребий выпал. Первым ходит:\n{first_step}")
     s(1)
     if first_step == 'bot':
-        pl = ch_field(field)
+        pl = ch_field(field,players[True][0],players[False][0])
         print(pl)
         bot.send_message(message.chat.id,f"\nbot ходит:\n{players[hod][0]} на {pl[0]+1}, {pl[1]+1}")
         field[pl[0]][pl[1]] = players[hod][0]
@@ -70,7 +70,8 @@ def game_message(message):
                     # bot.stop_bot()
                 # после успешного хода человека всегда ходит бот и передает ход человеку, предлагая команду
                 if not none_hod(field) and not finish: #ch_field(field) != None:
-                    pl = ch_field(field)
+                    pl = ch_field(field,players[True][0],players[False][0])
+
                     print(pl)
                     s(1)
                     bot.send_message(message.chat.id,f"\nbot ходит:\n{players[True][0]} на {pl[0]+1}, {pl[1]+1}")

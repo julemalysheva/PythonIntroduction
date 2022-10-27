@@ -23,7 +23,7 @@ def start_message(message):
 @bot.message_handler(commands=['game'])
 def game_message(message):
     global field, players, hod,finish, step
-    step = 0
+    step = 1 #было ошибочно 0, ничью не показывал
     finish = False
     field = new_field()
     text = print_field(field)
@@ -39,42 +39,6 @@ def game_message(message):
         chat_user(message)
         # bot.register_next_step_handler(message,chat_user)    
         
-    #     bot.send_message(message.chat.id,f'''Играйте! Вы ходите -{players[False][0]}-\nЧтобы сделать ход - 
-    # выберите соответствующую кнопку''',reply_markup=make_board(field))
-
-        # bot.register_message_handler(user_step,hod=False)
-        # AttributeError: 'TeleBot' object has no attribute 'register_message_handler' не находит метод
-        # bot.register_next_step_handler(msg,user_step)
-        # bot.register_message_handler(start_executor, commands=['start']) # Start command executor
-    # chat(message)
-
-# @bot.message_handler(content_types=['text'])
-# def chat(message):
-#     global finish
-#     # описать ходы?
-#     if step < 10: 
-#         if not finish:
-#             print('ход: ', hod)
-#             s(1)
-#             if hod: #т.е. если True - это бот
-#                 # bot.register_next_step_handler(message,bot_step)
-#                 bot_step(message)
-#                 # bot.send_message(message.chat.id,'Здесь будет ход бота') 
-#                 # bot.register_next_step_handler(message,chat)
-#             else: #т.е. если False - это человек,отправляем инлайн клавиатуру и обрабатываем call
-#                 bot.send_message(message.chat.id,f'''Играйте! Вы ходите -{players[False][0]}-\nЧтобы сделать ход - 
-#             выберите соответствующую кнопку''',reply_markup=make_board(field))
-#             # это добавить либо в обработку call, либо здесь это делать - посмотрим, но все равно нужен отдельный @
-#             # для обработки нажатия кнопки -поэтому лучше туда при положительном присвоении
-#                 # plus_step()
-#                 # reverse_hod()
-#                 # это где оставить, здесь или в call?
-#                 bot.register_next_step_handler(message,chat)
-
-#         else: bot.send_message(message.chat.id,'Игра завершена') 
-#     else: 
-#         finish = True
-#         bot.send_message(message.chat.id,'Игра завершена') 
             
 def chat_user(message):
     if step < 10: 
@@ -113,10 +77,11 @@ def reverse_hod():
     hod = not hod
     return hod    
 
+# обрабатываем ход бота и передаем ход человеку
 def bot_step(message):
     global finish, field
     if not none_hod(field) and not finish: 
-        pl = ch_field(field)
+        pl = ch_field(field,players[True][0],players[False][0])
         print('ход бота: ', hod)
         print(pl)
         s(1)
@@ -124,8 +89,9 @@ def bot_step(message):
         field[pl[0]][pl[1]] = players[True][0]
         plus_step()
         reverse_hod()
+        # убрала пока доску бота, т.к. потом юзер увидит на своей клавиатуре,только если не крайний ход бота
         text = print_field(field)
-        bot.send_message(message.chat.id,f"Игровое поле:\n{text}")
+        # bot.send_message(message.chat.id,f"Игровое поле:\n{text}")
         if check_win(field, players[True][0]):
             bot.send_message(message.chat.id,f"Bot выиграл!\n-{players[True][0]}-ки победили\nНачните новую /game")
             print('Bot выиграл!')

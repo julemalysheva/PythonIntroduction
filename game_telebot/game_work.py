@@ -69,10 +69,16 @@ def check_win(field, elem_go):
 
 
 # пробую функцию проверки свободных ячеек для рандомного хода бота - через кортежи - работает, но этого мало
-def ch_field(field):
-    _pos = [(index1,index2) for index1,value1 in enumerate(field) for index2,value2 in enumerate(value1) if value2=='_']
-    print(_pos)
-    pl = choice(_pos)
+def ch_field(field, bot_el,other_el):
+    if bot_hod(field, bot_el,other_el) != None:
+        pl = bot_hod(field, bot_el,other_el)
+    elif  field[1][1] == '_':
+        pl = (1, 1)  
+    else:     
+        _pos = [(index1,index2) for index1,value1 in enumerate(field) for index2,value2 in enumerate(value1) if value2=='_']
+        # print(_pos)
+        pl = choice(_pos)
+    print('оптимальный ход бота:', pl)
     return pl      
 
 # проверяем возможность хода в принципе
@@ -84,15 +90,73 @@ def none_hod(field):
     
     return none_hod
     
-
 # вернуться позже,нужно не просто рандом, а умный ход, где уже есть макс.число эл-та бота, иначе если нет
 # лучше закрывать ход соперника, а потом можно рандом из пустой строки, столбца
-# field = [['0','_','0'],['_','_','_'],['_','_','_']]
-# def bot_hod(field, bot_el): #other_el
-#     _pos = [(index1,index2) for index1,value1 in enumerate(field) for index2,value2 in enumerate(value1) if value2==bot_el]
-#     # for el in field:
-#     #     if el.count(bot_el) == 2:
-#     #         return (index(el),index('_')) #позже подумать, как сделать проверку индекса и пр.
-#     return _pos
+# field = [['_','_','_'],['_','_','_'],['_','_','_']]
+def bot_hod(field, bot_el,other_el): #other_el
+#сначала проверяем выигрышную позиции с эл-том бота 
+        # проверяем по строкам
+    for el in field:
+        if el.count(bot_el) == 2 and '_' in el:
+            pos = (field.index(el), el.index('_'))
+            return pos
+
+    col_in_row = list(map(list, zip(*field)))   
+    # print(col_in_row)
+    # проверяем по столбцаи   
+    for el in col_in_row:
+        if el.count(bot_el) == 2 and '_' in el:
+            # возвращаем э-ты наоборот,т.к. список транспонирован
+            pos = (el.index('_'), col_in_row.index(el))
+            return pos
+# проверяем главную диагональ
+    if field[0][0] == field[1][1]== bot_el and field[2][2] == '_':
+        return (2,2)
+    if field[0][0] == field[2][2]== bot_el and field[1][1] == '_':
+        return (1,1)
+    if field[2][2] == field[1][1]== bot_el and field[0][0] == '_':
+        return (0,0)
+# проверяем диагональ
+    if field[2][0] == field[1][1]== bot_el and field[0][2] == '_':
+        return (0,2)
+    if field[2][0] == field[0][2]== bot_el and field[1][1] == '_':
+        return (1,1)
+    if field[1][1] == field[0][2]== bot_el and field[2][0] == '_':
+        return (2,0)
+# теперь проверяем проигрышную позицию
+        # проверяем по строкам
+    for el in field:
+        if el.count(other_el) == 2 and '_' in el:
+            pos = (field.index(el), el.index('_'))
+            return pos
+
+    col_in_row = list(map(list, zip(*field)))   
+    # print(col_in_row)
+    # проверяем по столбцаи   
+    for el in col_in_row:
+        if el.count(other_el) == 2 and '_' in el:
+            # возвращаем э-ты наоборот,т.к. список транспонирован
+            pos = (el.index('_'), col_in_row.index(el))
+            return pos
+# проверяем главную диагональ
+    if field[0][0] == field[1][1]== other_el and field[2][2] == '_':
+        return (2,2)
+    if field[0][0] == field[2][2]== other_el and field[1][1] == '_':
+        return (1,1)
+    if field[2][2] == field[1][1]== other_el and field[0][0] == '_':
+        return (0,0)
+# проверяем диагональ
+    if field[2][0] == field[1][1]== other_el and field[0][2] == '_':
+        return (0,2)
+    if field[2][0] == field[0][2]== other_el and field[1][1] == '_':
+        return (1,1)
+    if field[1][1] == field[0][2]== other_el and field[2][0] == '_':
+        return (2,0)
+
+    # _pos = [(index1,index2) for index1,value1 in enumerate(field) for index2,value2 in enumerate(value1) if value2==bot_el]
+    # for el in field:
+    #     if el.count(bot_el) == 2:
+    #         return (index(el),index('_')) #позже подумать, как сделать проверку индекса и пр.
+    # return _pos
             
-# print(bot_hod(field,'0'))            
+# print(bot_hod(field,'0','x'))       #это было для проверки     
