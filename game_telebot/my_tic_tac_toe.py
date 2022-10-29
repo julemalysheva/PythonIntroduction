@@ -6,6 +6,9 @@ from time import sleep as s
 import config
 from telebot import *
 
+# сейчас с ботом может играть только один пользователь единовременно, т.к. поле общее и идет накладка 
+# при одновременной игре. Можно создавать каждому по id юзера и хранить список поля в словаре, после игры очищать
+# но пока не реализовано
 
 API_TOKEN=config.Token
 bot = telebot.TeleBot(API_TOKEN)
@@ -85,7 +88,7 @@ def bot_step(message):
         print('ход бота: ', hod)
         print(pl)
         s(1)
-        bot.send_message(message.chat.id,f"\nbot ходит:\n{players[True][0]} на {pl[0]+1}, {pl[1]+1}")
+        bot.send_message(message.chat.id,f"\nbot ходит:\n-{players[True][0]}- на {pl[0]+1}, {pl[1]+1}")
         field[pl[0]][pl[1]] = players[True][0]
         plus_step()
         reverse_hod()
@@ -94,13 +97,17 @@ def bot_step(message):
         # bot.send_message(message.chat.id,f"Игровое поле:\n{text}")
         if check_win(field, players[True][0]):
             bot.send_message(message.chat.id,f"Bot выиграл!\n-{players[True][0]}-ки победили\nНачните новую /game")
+            # добавляю измен.клавиатуры при выигрыше бота - тестирую
+            bot.edit_message_reply_markup(message.chat.id, message.message_id, reply_markup=make_board(field))
             print('Bot выиграл!')
             finish = True
         else: 
-            if step < 10:
+            if step < 10: #<10 было - тестировала 9, но закончил раньше, не пойму почему
                 chat_user(message)
             elif not finish:
                 finish = True
+                # добавляю измен.клавиатуры при выигрыше бота - тестирую
+                bot.edit_message_reply_markup(message.chat.id, message.message_id, reply_markup=make_board(field))
                 bot.send_message(message.chat.id,f"Игра завершена в ничью\nИгровое поле:\n{text}\nНачните новую /game")    
             # bot.register_next_step_handler(message,chat_user)    
     else: bot.send_message(message.chat.id,f"Игра завершена\nИгровое поле:\n{text}\nНачните новую /game")
@@ -128,7 +135,7 @@ def user_step(call):
                     reverse_hod()
                     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=make_board(field))
                     # bot.edit_message_reply_markup(message.chat.id, message.message_id, 'Выбери:', reply_markup=keyboard2)
-                    # text = print_field(field)
+                    text = print_field(field)
                     # bot.send_message(message.chat.id,f"Игровое поле:\n{text}")
                     if check_win(field, players[False][0]):
                         # bot.send_message(message.chat.id,f"Поздравляю с выигрышем!\n-{players[False][0]}-ки победили")
