@@ -1,10 +1,7 @@
 import telebot
-from random import * #можно сделать такую команду, которая например из названий ищет подробнее рандомно про кого-то
 from telebot import types
 import requests
-import json
 import config
-from processing_swapi import *
 from json import *
 
 
@@ -29,8 +26,13 @@ def start_message(message):
     /planets - получить все ресурсы планеты
     ''') 
 
-@bot.message_handler(commands=['people'])
-def get_people(message):
+# передавать срез команды, исключая / - 0 элемент [1:]
+@bot.message_handler(commands=['people','films','starships','vehicles','species','planets'])
+def get_commands(message):
+    print(message.text)
+    if message.text == '/films':
+        name = 'title'
+    else: name = 'name'    
     # как бы здесь добавить индикатор выполнения или гиф с часами хотя бы
     bot.send_message(message.chat.id, 'Идет поиск...,\nожидайте, пожалуйста')
     photo = open("A:\GB\PY\swapi_bot\img\main.gif", 'rb')
@@ -39,40 +41,35 @@ def get_people(message):
     #  "next": null, в конце, по 10 героев на странице
     # "https://swapi.dev/api/people/?page=1"
     # r = requests.get(url='https://swapi.dev/api/people/').json()
-    # bot.send_message(message.chat.id, f'Нашел героев, всего - {r["count"]}')
+    name_list = get_requests(message.text[1:],name, message)
+    bot.send_message(message.chat.id, "Жми, чтоб получить подробнее", reply_markup=make_keyboard(name_list,message.text[1:]))
 
-    # можно потом вынести в отдельную ф-цию, если по всем делать однотипные, просто передавать команду в url запроса
-    # а тип запроса и корневой url везде одинаковые - они возвращают список, мы его передаем в ф-цию, которая собирает
-    # инлайн клавиатуру - в data_call нужно помимо названия из списка добавить имя переданной команды для 
-    # последующей организации поиска
-    name_people = []
+def get_requests(resource, name, message):
+    name_list = []
     i = 1
     while i != 0:
         try:
-            r = requests.get(url=f'https://swapi.dev/api/people/?page={i}').json()
+            r = requests.get(url=f'https://swapi.dev/api/{resource}/?page={i}').json()
             if 'results' in r:
                 print('Нашел results')
                 for el in r['results']:
-                    # bot.send_message(message.chat.id, el['name'])
-                    name_people.append(el['name'])
+                    name_list.append(el[name])
             
-            bot.send_message(message.chat.id, f'Ищу на след.странице...') #{r["next"]}
+            bot.send_message(message.chat.id, f'Ищу на след.странице...') 
             if r["next"] != None: 
                 i+=1
             else: i = 0            
         except:
             print('что-то пошло не так')    
             bot.send_message(message.chat.id, 'что-то пошло не так\nпопробуй еще раз или позже..')
-    print(name_people)      
-    # bot.send_message(message.chat.id, ','.join(name_people))
-    bot.send_message(message.chat.id, "Жми, чтоб получить подробнее", reply_markup=make_keyboard(name_people,'people'))
+    print(name_list)  
+    return name_list    
 
 # формируем клавиатуру по 3 кнопки в строке  
 # можно в эту ф-цию передавать раздел, откуда пришел запрос, например people, и собирать это в callback_data,
 # чтоб при обработке callback_data вести поиск в нужном разделе
 # https://swapi.dev/api/people/?search=r2 - можно сразу формировать поисковый запрос в значение кнопки
 # https://swapi.dev/api/ - это базовый url
-
 def make_keyboard(li_item, resource):
     markup = types.InlineKeyboardMarkup(row_width = 3)
     i = 0
@@ -93,18 +90,41 @@ def make_keyboard(li_item, resource):
 def callback_query(call):
     # ссылка для поиска всегда берется из ответа: базовый url+полученный из кнопки
     search_url = root_url+call.data
-    # дальше смотри, может в зависимости от ресурса нужно собирать разные поля, тогда можно проверить:
-    if 'people' in call.data:
+    if call.data != None:
         bot.answer_callback_query(call.id, "Сейчас поищу")
         r = requests.get(url=search_url).json()
-        # print(r["results"][0])
         item = r["results"][0]
         # передали словарь для обработки красивого вывода - получили текст
-        item = print_people(r["results"][0])
+        item = print_item(r["results"][0])
         bot.send_message(call.message.chat.id, f"По запросу найдено\n{item}")
         # вывод картинки или инфы, что ее не нашли
         search_unsplash_photo(call)
 
+def print_item(dict):
+    txt = ''
+    not_li = ['created', 'edited','url']
+    list_search_name = ['homeworld','species','vehicles','starships','residents','pilots','planets','characters',
+    'people',]
+    for k,v in dict.items():
+        if k not in not_li and v != None:
+            if k == 'homeworld':
+                r = requests.get(v).json()  
+                txt+= f'\n{str(k)}:\t\t{r["name"]}\n' 
+            elif k == 'films':
+                films = []
+                for el in v:
+                    r = requests.get(el).json()
+                    films.append(r['title']) 
+                txt+= f'\n{str(k)}:\t\t{" ,".join(films)}\n' 
+            elif k in list_search_name:
+                search_name = []
+                for el in v:
+                    r = requests.get(el).json()
+                    search_name.append(r['name']) 
+                txt+= f'\n{str(k)}:\t\t{" ,".join(search_name)}\n' 
+            else:
+                txt+= f'\n{str(k)}:\t\t{v}\n'
+    return txt    
 
 # идет поиск выдача фото в случае успеха
 def search_unsplash_photo(call):
@@ -123,8 +143,6 @@ def search_unsplash_photo(call):
             bot.send_photo(call.message.chat.id,item)
         except: bot.send_message(call.message.chat.id, f"А вот картинку я не нашел...")    
     else: bot.send_message(call.message.chat.id, f"А вот картинку я не нашел...")
-
-
 
    
 bot.polling()
