@@ -56,7 +56,7 @@ def get_people(message):
                     # bot.send_message(message.chat.id, el['name'])
                     name_people.append(el['name'])
             
-            bot.send_message(message.chat.id, f'след.страница - {r["next"]}')
+            bot.send_message(message.chat.id, f'Ищу на след.странице...') #{r["next"]}
             if r["next"] != None: 
                 i+=1
             else: i = 0            
@@ -97,13 +97,33 @@ def callback_query(call):
     if 'people' in call.data:
         bot.answer_callback_query(call.id, "Сейчас поищу")
         r = requests.get(url=search_url).json()
-        print(r["results"][0])
+        # print(r["results"][0])
         item = r["results"][0]
         # передали словарь для обработки красивого вывода - получили текст
         item = print_people(r["results"][0])
         bot.send_message(call.message.chat.id, f"По запросу найдено\n{item}")
-        # нужно поискать картинку) этот адрес нужно собрать через запрос
-        bot.send_photo(call.message.chat.id,'https://avatars.mds.yandex.net/i?id=3085ef43b7c7d7b5faa6e13460ba624f-5607836-images-thumbs&n=13')
+        # вывод картинки или инфы, что ее не нашли
+        search_unsplash_photo(call)
+
+
+# идет поиск выдача фото в случае успеха
+def search_unsplash_photo(call):
+    # берем правую часть от строки, а именно имя героя и т.д.
+    el_query = call.data.split('=')[1]
+    query = f'https://api.unsplash.com/search/photos?page=1&query={el_query}'
+    headers = {'Accept-Version': 'v1', 'Authorization': f'Client-ID {config.AccessKey}'}
+    response = requests.get(query, headers=headers)
+    if response.status_code == 200:
+        try:
+            print(response)
+            response = response.json()
+            item = response['results'][0]["urls"]['regular']
+            autor = response['results'][0]["user"]['name']
+            bot.send_message(call.message.chat.id, f"Вот что нашел на unsplash.com\nАвтор {autor}")
+            bot.send_photo(call.message.chat.id,item)
+        except: bot.send_message(call.message.chat.id, f"А вот картинку я не нашел...")    
+    else: bot.send_message(call.message.chat.id, f"А вот картинку я не нашел...")
+
 
 
    
