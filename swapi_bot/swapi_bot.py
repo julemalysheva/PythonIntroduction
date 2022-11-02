@@ -42,13 +42,14 @@ def get_commands(message):
     # "https://swapi.dev/api/people/?page=1"
     # r = requests.get(url='https://swapi.dev/api/people/').json()
     name_list = get_requests(message.text[1:],name, message)
-    bot.send_message(message.chat.id, "Жми, чтоб получить подробнее", reply_markup=make_keyboard(name_list,message.text[1:]))
+    if len(name_list)>0:
+        bot.send_message(message.chat.id, "Жми, чтоб получить подробнее", reply_markup=make_keyboard(name_list,message.text[1:]))
 
 def get_requests(resource, name, message):
     name_list = []
     i = 1
-    while i != 0:
-        try:
+    try:
+        while i != 0:
             r = requests.get(url=f'https://swapi.dev/api/{resource}/?page={i}').json()
             if 'results' in r:
                 print('Нашел results')
@@ -59,9 +60,9 @@ def get_requests(resource, name, message):
             if r["next"] != None: 
                 i+=1
             else: i = 0            
-        except:
-            print('что-то пошло не так')    
-            bot.send_message(message.chat.id, 'что-то пошло не так\nпопробуй еще раз или позже..')
+    except:
+        print('что-то пошло не так')    
+        bot.send_message(message.chat.id, 'что-то пошло не так\nпопробуй еще раз или позже..')
     print(name_list)  
     return name_list    
 
