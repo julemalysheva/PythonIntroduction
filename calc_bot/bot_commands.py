@@ -20,7 +20,7 @@ def start(update, _):
     """Вызывается по команде `/start`."""
     # Получаем пользователя, который запустил команду `/start`
     user = update.message.from_user
-    log(update, _, 'Пользователь начал разговор')
+    log(update, _, f'Пользователь начал разговор {update.message.text}')
     # logger.info("Пользователь %s начал разговор", user.first_name)
     # Создаем `InlineKeyboard`, где каждая кнопка имеет
     # отображаемый текст и строку `callback_data`
@@ -45,11 +45,11 @@ def start(update, _):
     return FIRST
 
 
-def start_over(update, _):
+def start_over(update, context):
     """Тот же текст и клавиатура, что и при `/start`, но не как новое сообщение"""
     # Получаем `CallbackQuery` из обновления `update`
     query = update.callback_query
-    log(update, _, 'Пользователь вернулся в меню')
+    log(update, context, 'Пользователь вернулся в меню')
     # На запросы обратного вызова необходимо ответить,
     # даже если уведомление для пользователя не требуется.
     # В противном случае у некоторых клиентов могут возникнуть проблемы.
@@ -70,9 +70,11 @@ def start_over(update, _):
     # )
     # делаю не изменение, а ответ, иначе затирается ранее выданный результат
     # update.message.reply_text(
-    query.send_message(        
-        text="Выберите из предложенных пунктов меню:", reply_markup=reply_markup
-    )
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text="Выберите из предложенных пунктов меню:", reply_markup=reply_markup)
+    # query.send_message(
+    #     text="Выберите из предложенных пунктов меню:", reply_markup=reply_markup
+    # )
 
     # Сообщаем `ConversationHandler`, что сейчас находимся в состоянии `FIRST`
     return FIRST
@@ -80,7 +82,7 @@ def start_over(update, _):
 
 def input_data(update, _):
     """Запрос строки выражения"""
-    log(update, _, 'Пользователь вводит выражение')
+    log(update, _, 'Выбран пункт меню: "Рассчитать выражение"')
     query = update.callback_query
     query.answer()
     query.edit_message_text(
@@ -98,7 +100,8 @@ def input_data(update, _):
 
 
 def view_result(update, _):
-    log(update, _, 'Выдаем результат расчета')
+    log(update, _, f'Пользователь ввел выражение {update.message.text}')
+    # log(update, _, 'Выдаем результат расчета')
     # в input_data просим ввести строку для расчета, после чего здесь выдаем результат через calc_data и
     # новые кнопки для возврата в меню или выхода из программы
     user_input = update.message.text
@@ -112,6 +115,8 @@ def view_result(update, _):
     else:
         # В выражении недопустимые символы - возвращаем это пользователю
         result = check_data(user_input)
+
+    log(update, _, f'Выдаем результат: {result}')
 
     keyboard = [
         [
@@ -150,9 +155,11 @@ def view_log(update, context):
     # или здесь context?
     query.bot.send_document(chat_id=update.effective_chat.id, document=open('calc_bot/calc_bot.txt', 'rb'), caption='Файл лога',
                             )
-    update.message.reply_text(
-        text="Начать сначала?", reply_markup=reply_markup
-    )
+    # update.message.reply_text(
+    #     text="Начать сначала?", reply_markup=reply_markup
+    # )
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                        text="Начать сначала?", reply_markup=reply_markup)
 
     # query.edit_message_text(
     #     text="Начать сначала?", reply_markup=reply_markup
@@ -162,13 +169,16 @@ def view_log(update, context):
     return SECOND
 
 
-def end(update, _):
+def end(update, context):
     """Возвращает `ConversationHandler.END`, который говорит
     `ConversationHandler` что разговор окончен"""
-    log(update, _, 'Пользователь завершил разговор')
+    log(update, context, 'Пользователь завершил разговор')
     query = update.callback_query
     query.answer()
-    update.message.reply_text(text="Увидимся в другой раз!")
+    # update.message.reply_text(text="Увидимся в другой раз!")
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text="Увидимся в другой раз!")
+
     return ConversationHandler.END
 
 
