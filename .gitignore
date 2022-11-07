@@ -2,7 +2,8 @@
 __pycache__/
 **[cod]
 *$py.class
-
+# тестирую Оли Симак
+test_Olya.py
 # C extensions
 *.so
 
