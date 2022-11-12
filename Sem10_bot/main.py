@@ -42,7 +42,7 @@ def flight_load():
     print(flight_read)
 
     # изменение типа данных - указать формат даты, иначе предупреждает
-    # пока это не стала реализовывать, отбора по датам нет еще
+    # пока это не стала реализовывать, отбора по датам нет еще - было "datetime64[ns]"
     flight_read['date'] = flight_read['date'].astype("datetime64[ns]") 
     # - это можно использовать для дат - чтоб формировать запрос в периоде
 
@@ -265,12 +265,25 @@ def for_day(message):
                 bot.send_message(message.chat.id, text=f'Записи за {dt_day} в файле 👇')
                 bot.send_document(message.chat.id, doc,caption='Полеты за день')
                 doc.close()
+
+                tdi = fl_day.fl_hours.sum() #сумма налета часов - считает дельты по строкам за день
+                print(tdi) 
+                tdi = tdi /  np.timedelta64(1,  "h") #пытаюсь перевести в часы, получаю верно - тип Флоат
+                # собираю строку с корректными итогами в нужном мне формате часов
+                count_day = fl_day.count_fl.sum()
+                new_row = pd.Series(data={'fl_hours': tdi, 'count_fl':count_day}, name='Итог')
+                #append row to the dataframe 
+                fl_day = fl_day.append(new_row, ignore_index=False)
+
                 # просто через текстовый файл для лучшей читаемости
                 with open('day.txt', 'w', encoding="utf8") as file:
-                    file.write(f'Записи за {dt_day}:\n{flight_read[fn].to_markdown(tablefmt="grid")}')
+                    file.write(f'Записи за {dt_day}:\n{fl_day.to_markdown(tablefmt="grid")}')
                 doc = open('day.txt', 'rb')
                 bot.send_document(message.chat.id, doc, caption='Полеты за день')
                 doc.close()
+                bot.send_message(message.chat.id, text=f'''Итог за {dt_day[2]}-{dt_day[1]}-{dt_day[0]}:
+                Налёт часов = {tdi}
+                Число вылетов = {count_day} ''')
 
             except:         
                 bot.send_message(message.chat.id, text='Не удалось сформировать файл с данными .xlsx')
