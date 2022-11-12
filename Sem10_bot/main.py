@@ -10,6 +10,7 @@ flight = []
 flight_read = None
 head_flight = ['date', 'type_flight', 'n_exe', 't_of_d', 'fl_hours', 'count_fl', 'score', 'num_rec']
 
+# заменить перечень команд на строковую переменную и добавить везде - сократить код
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
@@ -243,34 +244,39 @@ def data_message(message):
     # обновляем DataFrame
     try:
         flight_load()    
-        bot.send_message(message.chat.id, text=flight_read.to_markdown(tablefmt="grid"))
+        # можно отпраить в телеграмм таблицей, но это не особо красиво
+        # bot.send_message(message.chat.id, text=flight_read.to_markdown(tablefmt="grid"))
+        # формируем файл с полным набором данных - отправляем
+        try:
+            flight_read.to_excel('A:\GB\PY\data_flights.xlsx')  
+            doc = open('A:\GB\PY\data_flights.xlsx', 'rb')
+            bot.send_message(message.chat.id, text='Полный набор данных смотри в файле 👇')
+            bot.send_document(message.chat.id, doc,caption='Полный набор данных')
+            doc.close()
+        except:         
+            bot.send_message(message.chat.id, text='Не удалось сформировать файл с данными .xlsx')
+        # для проверки печаю себе фрейм
         print(flight_read.to_markdown())
-        print(flight_read.index)
-        print(flight_read.info())
-        # сформировать здесь свод в разрезе нужных группировок - только общие данные
-    #  .to_markdown() - отправить красиво, может файлом?
 
+        # сформировать здесь свод в разрезе нужных группировок - только общие данные
         tdi = flight_read.fl_hours.sum() #сумма налета часов - считает дельты по строкам
         print(tdi) #0 days 07:15:00
         # tdi = tdi /  np.timedelta64(1,  "h") #пытаюсь перевести в часы, получаю верно - тип Флоат
         # print(tdi) #7.25
-        # пробую получить только часы и минуты без дней
+        # для проверки пробую получить только часы и минуты без дней др.способом - одинаково
         minutes = tdi.total_seconds()/60
         hours = minutes/60
         print(tdi.total_seconds(),minutes, hours) #26100.0 435.0 7.25
 
-        bot.send_message(message.chat.id, text=f'Время вылетов:\n {flight_read.fl_hours}')
-        bot.send_message(message.chat.id, text=f'Сумма налета: {flight_read.fl_hours.sum()}')
-        # в итоге мне нужен именно этот показатель в часах - Сумма налета к часам: 7.25
-        # в разных вариантах группировки
-        bot.send_message(message.chat.id, text=f'Сумма налета к часам: {flight_read.fl_hours.sum()/ np.timedelta64(1,  "h")}')
-        bot.send_message(message.chat.id, text=f'Сумма вылетов: {flight_read.count_fl.sum(numeric_only=True)}')
-
         # формирую свод: Время суток - Налет - кол.полетов
         print('для свода\n',flight_read.info())
         svod_data = flight_read.groupby(['t_of_d','type_flight']).sum(numeric_only=False)[['fl_hours','count_fl']]
+        # собираю строку с корректными итогами в нужном мне формате часов
+        new_row = pd.Series(data={'fl_hours': hours, 'count_fl':flight_read.count_fl.sum()}, name='Итог')
+         #append row to the dataframe 
+        svod_data = svod_data.append(new_row, ignore_index=False)
+
         print(svod_data.to_markdown())
-        # print(df.to_markdown(tablefmt="grid"))
         bot.send_message(message.chat.id, text=f'Свод по времени суток:\n {svod_data.to_markdown(tablefmt="grid")}')
         # пробую это представление скопировать в буфер обмена и вставить в текстовый файл для корректного вывода
         # svod_data.to_markdown().to_clipboard(excel=False, sep=None)
@@ -285,6 +291,7 @@ def data_message(message):
         bot.send_message(message.chat.id, text='''Данные не обнаружены.
         Жми, чтобы добавить:
         /add - добавить информацию о полете''')
+        
 
 # по хорошему здесь и в ф-цмм выше д.б.только варианты выборки на кнопках, которые будут обрабатываться
 # соотв.декоратором по типу текста и по условию в ф-ции
