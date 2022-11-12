@@ -272,7 +272,15 @@ def data_message(message):
         print(svod_data.to_markdown())
         # print(df.to_markdown(tablefmt="grid"))
         bot.send_message(message.chat.id, text=f'Свод по времени суток:\n {svod_data.to_markdown(tablefmt="grid")}')
-    
+        # пробую это представление скопировать в буфер обмена и вставить в текстовый файл для корректного вывода
+        # svod_data.to_markdown().to_clipboard(excel=False, sep=None)
+        # просто через текстовый файл для лучшей читаемости
+        with open('svod.txt', 'w', encoding="utf8") as file:
+            file.write(f"Свод данных по видам и времени суток:\n{svod_data.to_markdown()}")
+        doc = open('svod.txt', 'rb')
+        bot.send_document(message.chat.id, doc, caption='Свод данных по видам и времени суток')
+        doc.close()
+
     except:
         bot.send_message(message.chat.id, text='''Данные не обнаружены.
         Жми, чтобы добавить:
@@ -330,7 +338,7 @@ def delete_message(message):
             item1=types.KeyboardButton("Отмена")
             markup.add(item1)
             doc = open('A:\GB\PY\data_flights.xlsx', 'rb')
-            msg = bot.send_document(message.chat.id, doc,reply_markup=markup)
+            msg = bot.send_document(message.chat.id, doc,caption='Полный набор данных',reply_markup=markup)
             doc.close()
             bot.register_next_step_handler(msg, del_row)
         except:         
@@ -387,7 +395,7 @@ def del_row(message):
                     try:
                         flight_read.to_excel('A:\GB\PY\data_flights.xlsx')  
                         doc = open('A:\GB\PY\data_flights.xlsx', 'rb')
-                        msg = bot.send_document(message.chat.id, doc)
+                        msg = bot.send_document(message.chat.id, doc, caption='Полный набор данных')
                         doc.close()
                     except:         
                         bot.send_message(message.chat.id, text='Не удалось сформировать файл с данными .xlsx')
