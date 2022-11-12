@@ -10,6 +10,13 @@ bot = telebot.TeleBot(API_TOKEN)
 flight = []
 flight_read = None
 head_flight = ['date', 'type_flight', 'n_exe', 't_of_d', 'fl_hours', 'count_fl', 'score', 'num_rec']
+command = '''
+    /add - добавить информацию о полете
+    /for_day - отобрать записи по дате
+    /data - посмотреть сводные данные
+    /select - получить итоги выборки и Excel-файлы
+    /del - удалить запись по полету
+'''
 
 # заменить перечень команд на строковую переменную и добавить везде - сократить код
 
@@ -21,13 +28,7 @@ def start_message(message):
     Помогу тебе вести учет полетов.
 
     Выбери интересующий пункт меню:
-    /load - загрузить из файла
-    /add - добавить информацию о полете
-    /for_day - отобрать записи по дате
-    /data - посмотреть сводные данные
-    /select - получить выборки из базы в Excel
-    /del - удалить запись по полету
-    ''')
+    /load - загрузить из файла {command}''')
     # /data - можно сделать меню с вариантами выборки по кнопкам
 # добавить потом кнопочное меню
 # при вводе значений можно добавить проверку формата через регулярку
@@ -56,13 +57,8 @@ def flight_load():
 def load_message(message):
     try:
         flight_load()
-        bot.send_message(message.chat.id, text='''Данные загружены.
-        Выбери интересующий пункт меню:
-        /add - добавить информацию о полете
-        /data - посмотреть сводные данные
-        /select - получить выборки из базы в Excel
-        /del - удалить запись по полету
-        ''')
+        bot.send_message(message.chat.id, text=f'''Данные загружены.
+        Выбери интересующий пункт меню:{command}''')
     except:
         bot.send_message(message.chat.id, text='''Данные не обнаружены.
         Жми, чтобы добавить:
@@ -83,11 +79,11 @@ def add_message(message):
 def date_input(message):
     global flight
     try:
-        flight_date = message.text
+        # 2022-12-11 нужен такой формат в csv для корректной проверки
+        flight_date = '-'.join(reversed(message.text.split('.')))
+        print(flight_date)
         flight.append(flight_date)
         print(flight)
-        # добавить варианты через инлайн клавиатуру - 3 знач
-        # может лучше сделать обычную? для считывания текста сразу в поле
         keyboard = types.InlineKeyboardMarkup(row_width=1)
         b1 = types.InlineKeyboardButton(
             text='Десантирование войск боевой техники', callback_data='Десантирование')
@@ -216,23 +212,15 @@ def process_confirm(message):
         confirm = message.text
         if confirm == 'Ок':
             # вывести команды или кнопки меню в отдельную ф-цию и вызывать ее после события
-            bot.reply_to(message, '''Данные сохранены.
-            Выбери интересующий пункт меню:
-            /add - добавить информацию о полете
-            /data - посмотреть сводные данные
-            /select - получить выборки из базы в Excel
-            /del - удалить запись по полету''')
+            bot.reply_to(message, f'''Данные сохранены.
+            Выбери интересующий пункт меню:{command}''')
             # добавляется запись в текущий или вновь созданный файл по команде /add - завершающий шаг
             with open('flight.csv', 'a', encoding="utf8") as file:
                 file.write(f"{','.join(flight)}\n")
 
         elif confirm == 'Нет':
-            bot.reply_to(message, '''Данные очищены.
-            Выбери интересующий пункт меню:
-            /add - добавить информацию о полете
-            /data - посмотреть сводные данные
-            /select - получить выборки из базы в Excel
-            /del - удалить запись по полету''')
+            bot.reply_to(message, f'''Данные очищены.
+            Выбери интересующий пункт меню:{command}''')
             flight.clear()
             print(f'Список очищен {flight}')
         else:
@@ -243,7 +231,7 @@ def process_confirm(message):
 @bot.message_handler(commands=['for_day'])
 def date_message(message):
     msg = bot.reply_to(
-        message, 'Укажи дату - через запятую: год,месяц,день\nНапример: 2018,10,24 или 2022,2,25')
+        message, 'Укажи дату - в формате: дд.мм.гггг\nНапример: 24.10.2018 или 25.02.2022')
     bot.register_next_step_handler(msg, for_day)
 
 def for_day(message):
@@ -251,16 +239,18 @@ def for_day(message):
     try:
         flight_load()    
         try:
-            dt_day = tuple(map(int, message.text.split(',')))
+            dt_day = tuple(map(int, message.text.split('.')))
             print('dt_day', dt_day)
                 # пробую по дате date -? np.datetime64("2018-01-01") - не сработало, datetime сработало
-            fn = flight_read["date"].map(lambda x: x == datetime.datetime(dt_day[0],dt_day[1],dt_day[2]))
+            fn = flight_read["date"].map(lambda x: x == datetime.datetime(dt_day[2],dt_day[1],dt_day[0]))
                 # (int(dt_day[0]),int(dt_day[1]),int(dt_day[2])))
             bot.send_message(message.chat.id, text=f'По дате\n\n{flight_read[fn].to_markdown(tablefmt="grid")}')
             try:
                     # список по дате выгружаем в файл и отправляем
                 fl_day = flight_read[fn]
-                fl_day.to_excel('A:\GB\PY\data_flights.xlsx')  
+                new_df = fl_day.apply(lambda x: round(x / np.timedelta64(1,  "h"),2) if x.name == 'fl_hours' else x)       
+
+                new_df.to_excel('A:\GB\PY\data_flights.xlsx')  
                 doc = open('A:\GB\PY\data_flights.xlsx', 'rb')
                 bot.send_message(message.chat.id, text=f'Записи за {dt_day} в файле 👇')
                 bot.send_document(message.chat.id, doc,caption='Полеты за день')
@@ -306,7 +296,8 @@ def data_message(message):
         # bot.send_message(message.chat.id, text=flight_read.to_markdown(tablefmt="grid"))
         # формируем файл с полным набором данных - отправляем
         try:
-            flight_read.to_excel('A:\GB\PY\data_flights.xlsx')  
+            new_df = flight_read.apply(lambda x: round(x / np.timedelta64(1,  "h"),2) if x.name == 'fl_hours' else x)       
+            new_df.to_excel('A:\GB\PY\data_flights.xlsx')  
             doc = open('A:\GB\PY\data_flights.xlsx', 'rb')
             bot.send_message(message.chat.id, text='Полный набор данных смотри в файле 👇')
             bot.send_document(message.chat.id, doc,caption='Полный набор данных')
@@ -359,7 +350,8 @@ def delete_message(message):
         flight_load() 
         print('загрузили фрейм перед удалением строки')
         try:
-            flight_read.to_excel('A:\GB\PY\data_flights.xlsx')  
+            new_df = flight_read.apply(lambda x: round(x / np.timedelta64(1,  "h"),2) if x.name == 'fl_hours' else x)       
+            new_df.to_excel('A:\GB\PY\data_flights.xlsx')  
             # по аналогии можно будет сделать диапазон через - или запятую
             bot.send_message(message.chat.id, '✍️ Укажи индекс для удаления строки\nСмотри левый столбец в файле 👇')
              # добавить кнопку Отмена и регистрацию след.обработчика при вводе ответа
@@ -406,7 +398,8 @@ def del_row(message):
                     flight_load() 
                     print('загрузили фрейм после удаления')
                     try:
-                        flight_read.to_excel('A:\GB\PY\data_flights.xlsx')  
+                        new_df = flight_read.apply(lambda x: round(x / np.timedelta64(1,  "h"),2) if x.name == 'fl_hours' else x)       
+                        new_df.to_excel('A:\GB\PY\data_flights.xlsx')  
                         doc = open('A:\GB\PY\data_flights.xlsx', 'rb')
                         msg = bot.send_document(message.chat.id, doc, caption='Полный набор данных')
                         doc.close()
@@ -436,12 +429,8 @@ def selections_message(message):
 def message_reply(message):
     if message.text=="Отмена":
         markup = telebot.types.ReplyKeyboardRemove()    
-        bot.reply_to(message, '''Хорошо.
-        Выбери интересующий пункт меню:
-        /add - добавить информацию о полете
-        /data - посмотреть сводные данные
-        /select - выборки из базы
-        /del - удалить запись по полету
+        bot.reply_to(message, f'''Хорошо.
+        Выбери интересующий пункт меню:{command}
         ''',reply_markup=markup)
             #     bot.send_message(message.chat.id,'Спасибо за прочтение статьи!')
     #     # markup.remove(item1) так она пересчает работать, но сама кнопка есть
