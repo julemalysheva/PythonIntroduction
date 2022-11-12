@@ -281,6 +281,7 @@ def for_day(message):
                 doc = open('day.txt', 'rb')
                 bot.send_document(message.chat.id, doc, caption='Полеты за день')
                 doc.close()
+                # отправка итогов дня в сообщение бота
                 bot.send_message(message.chat.id, text=f'''Итог за {dt_day[2]}-{dt_day[1]}-{dt_day[0]}:
                 Налёт часов = {tdi}
                 Число вылетов = {count_day} ''')
@@ -350,30 +351,6 @@ def data_message(message):
         /add - добавить информацию о полете''')
 
 
-# здесь во фрейм выборки можно добавить итоговую строку с суммой?
-@bot.message_handler(commands=['select'])
-def selections_message(message):
-    # обновляем DataFrame
-    try:
-        flight_load()    
-        # выборки по полям/значениям - пробую варианты - потом их разместить под кнопки и обработчиком текста выводить
-        # по своим ф-циям
-        fn = flight_read["type_flight"].map(lambda x: x == "Десантирование")
-        # аналогично по др. полям - но здесь нет итогов
-        print(flight_read[fn])
-        bot.send_message(message.chat.id, text=flight_read[fn].to_markdown(tablefmt="grid"))
-        # ночные/дневные
-        fn = flight_read["t_of_d"].map(lambda x: x == "Д")
-        print('дневные', flight_read[fn])
-        bot.send_message(message.chat.id, text=f'Дневные полеты \n{flight_read[fn].to_markdown(tablefmt="grid")}')
-        # ночные
-        fn = flight_read["t_of_d"].map(lambda x: x == "Н")
-        print('ночные', flight_read[fn])
-        bot.send_message(message.chat.id, text=f'Ночные полеты \n{flight_read[fn].to_markdown(tablefmt="grid")}')
-    except:
-        bot.send_message(message.chat.id, text='''Данные не обнаружены.
-        Жми, чтобы добавить:
-        /add - добавить информацию о полете''')
 
 @bot.message_handler(commands=['del'])
 def delete_message(message):
@@ -402,22 +379,6 @@ def delete_message(message):
         bot.send_message(message.chat.id, text='''Данные не обнаружены.
         Жми, чтобы добавить:
         /add - добавить информацию о полете''')
-
-@bot.message_handler(content_types='text')
-def message_reply(message):
-    if message.text=="Отмена":
-        markup = telebot.types.ReplyKeyboardRemove()    
-        bot.reply_to(message, '''Хорошо.
-        Выбери интересующий пункт меню:
-        /add - добавить информацию о полете
-        /data - посмотреть сводные данные
-        /select - выборки из базы
-        /del - удалить запись по полету
-        ''',reply_markup=markup)
-    # elif message.text=="Кнопка 2":
-    #     bot.send_message(message.chat.id,'Спасибо за прочтение статьи!')
-    #     # markup.remove(item1) так она пересчает работать, но сама кнопка есть
-
 
 def del_row(message):
     global flight_read
@@ -461,6 +422,79 @@ def del_row(message):
             bot.reply_to(message, 'oooops')
     else:
         message_reply(message)        
+
+# здесь во фрейм выборки можно добавить итоговую строку с суммой?
+@bot.message_handler(commands=['select'])
+def selections_message(message):
+    markup = types.ReplyKeyboardMarkup(
+        one_time_keyboard=True, resize_keyboard=True)
+    markup.add('Десантирование', 'СОЖ','Перевозка','Ночные','Дневные','Отмена')
+    bot.reply_to(
+            message, '👇 твой выбор', reply_markup=markup)
+
+@bot.message_handler(content_types='text')
+def message_reply(message):
+    if message.text=="Отмена":
+        markup = telebot.types.ReplyKeyboardRemove()    
+        bot.reply_to(message, '''Хорошо.
+        Выбери интересующий пункт меню:
+        /add - добавить информацию о полете
+        /data - посмотреть сводные данные
+        /select - выборки из базы
+        /del - удалить запись по полету
+        ''',reply_markup=markup)
+            #     bot.send_message(message.chat.id,'Спасибо за прочтение статьи!')
+    #     # markup.remove(item1) так она пересчает работать, но сама кнопка есть
+
+    elif message.text in ['Десантирование', 'СОЖ','Перевозка','Ночные','Дневные','Отмена']:
+    # обновляем DataFrame
+        try:
+            flight_load()  
+        except:
+            bot.send_message(message.chat.id, text='''Данные не обнаружены.
+            Жми, чтобы добавить:
+            /add - добавить информацию о полете''')
+
+        if message.text in ["Десантирование","СОЖ","Перевозка"]:
+            fn = flight_read["type_flight"].map(lambda x: x == message.text)
+        elif message.text == 'Ночные':    
+            fn = flight_read["t_of_d"].map(lambda x: x == "Н")
+        elif message.text == 'Дневные':
+            fn = flight_read["t_of_d"].map(lambda x: x == "Д")
+            # аналогично по др. полям - но здесь нет итогов
+        df = flight_read[fn]
+        print(flight_read[fn])
+        # пробую преобразовать значения налета часов во флоат по столбцу
+        new_df = df.apply(lambda x: round(x / np.timedelta64(1,  "h"),2) if x.name == 'fl_hours' else x)       
+         # bot.send_message(message.chat.id, text=flight_read[fn].to_markdown(tablefmt="grid"))
+        new_df.to_excel('A:\GB\PY\data_flights.xlsx')  
+        doc = open('A:\GB\PY\data_flights.xlsx', 'rb')
+        bot.send_message(message.chat.id, text=f'Данные по запросу {message.text} в файле 👇')
+        bot.send_document(message.chat.id, doc,caption='Результаты отбора')
+        doc.close()
+
+        tdi = df.fl_hours.sum() #сумма налета часов - считает дельты по строкам из выборки
+        print(tdi) 
+        tdi = tdi /  np.timedelta64(1,  "h") #пытаюсь перевести в часы, получаю верно - тип Флоат
+        # собираю строку с корректными итогами в нужном мне формате часов
+        count_day = df.count_fl.sum()
+        new_row = pd.Series(data={'fl_hours': tdi, 'count_fl':count_day}, name='Итог')
+        #append row to the dataframe 
+        df = df.append(new_row, ignore_index=False)
+
+        # просто через текстовый файл для лучшей читаемости
+        with open('select.txt', 'w', encoding="utf8") as file:
+                file.write(f'Записи по запросу {message.text}:\n{df.to_markdown(tablefmt="grid")}')
+        doc = open('select.txt', 'rb')
+        bot.send_document(message.chat.id, doc, caption='Записи по запросу')
+        doc.close()
+        # отправка итогов дня в сообщение бота
+        bot.send_message(message.chat.id, text=f'''Итог по запросу {message.text}:
+        Налёт часов = {tdi}
+        Число вылетов = {count_day} ''')
+    else:
+        bot.send_message(message.chat.id, text='Я не понимаю. Укажи команду или выбери в menu')
+
 
 
 bot.polling()
