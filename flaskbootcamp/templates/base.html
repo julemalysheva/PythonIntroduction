@@ -5,12 +5,25 @@
     <meta charset="UTF-8">
     <title>Главная страница</title>
 </head>
+
+<style>
+    html{
+        background-color: rgb(127, 255, 212);
+    }
+</style>
+
 <body>
-{% if name %}
-    <p>Ты выиграл!</p>
-{% else %}    
-    <p>Ты проиграл</p>
-{% endif %}    
+
+{% if data %}
+    <table>
+        <tr><th>Имя</th><th>Фамилия</th><th>Дата рождения</th></tr>
+        {% for row in data %}
+            <tr><td>{{ row[0] }}</td><td>{{ row[1] }}</td><td>{{ row[2] }}</td></tr>
+        {% endfor %}
+    </table>
+{% endif %}
+
+<h3><a href="/about">О нас</a></h3>
 
 {% endblock %}
 </body>
