@@ -12,6 +12,8 @@ def main():
 
     return render_template('base.html', data=resultData)
 
+# render_templat
+# возвращает html код из указанного файла из папки templat
 @app.route('/about')
 def about():
     return render_template('about.html')

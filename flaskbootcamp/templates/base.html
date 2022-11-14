@@ -13,18 +13,22 @@
 </style>
 
 <body>
-
+<!-- указываем условие -->
 {% if data %}
+<!-- заполняем таблицу -->
     <table>
         <tr><th>Имя</th><th>Фамилия</th><th>Дата рождения</th></tr>
         {% for row in data %}
             <tr><td>{{ row[0] }}</td><td>{{ row[1] }}</td><td>{{ row[2] }}</td></tr>
-        {% endfor %}
+        {% endfor %} 
+        <!-- конец цикла -->
     </table>
 {% endif %}
+<!-- конец условия -->
 
 <h3><a href="/about">О нас</a></h3>
 
 {% endblock %}
+<!-- конец контента шаблонизатора -->
 </body>
 </html>
