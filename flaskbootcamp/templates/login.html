@@ -1,0 +1,27 @@
+{% extends 'base.html '%}
+<!--  наследование из указанного файла  -->
+
+<!-- 1-укажем блок контент -->
+{% block content %}
+{%if form%}
+<form action="" method="post">
+    <!-- предотвращение csrf атак -->
+    {{ form.csrf_token }}
+
+    {{ form.email.label }}
+    {{ form.email()}}
+    <br>
+    {{ form.password.label }}
+    {{ form.password()}}
+
+    <br>
+    {{ form.submit()}}
+{% endif %}
+
+    {{ message }}
+
+
+</form>
+
+
+{% endblock %}
